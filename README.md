@@ -13,4 +13,4 @@ Current coverage: 14 aluminum, steel, stainless and titanium grades, room-temper
 
 **Advisory only.** A screening aid, not a material approval, design allowable or certification. Verify every value before use in a design.
 
-Runs entirely in your browser. Nothing you type is sent anywhere.
+Runs entirely in your browser. The values you enter never leave it; only anonymous page and button counts are recorded.
