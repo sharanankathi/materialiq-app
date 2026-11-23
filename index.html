@@ -325,7 +325,7 @@ dialog::backdrop{background:rgba(28,28,30,.45)}
 (function(){
 "use strict";
 const DATA = window.MIQ_DATA, E = MIQEngine.make(DATA), C = E.CONST;
-const FEEDBACK_URL = "";
+const FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdGQBX4dnFgtySfGEQZ4jDOpQ9sBNOdVT0GM7iiCxf5bXjI4g/viewform";
 const hasFeedback = !!FEEDBACK_URL && FEEDBACK_URL.indexOf("__") < 0;
 const GC_CODE = "";
 function track(name){ try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: name, title: name, event: true}); } catch (e) {} }
