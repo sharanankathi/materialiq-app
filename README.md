@@ -9,7 +9,7 @@ Screen metals for a part in under a minute, with every number traced to its sour
 - Every value links to its page in MIL-HDBK-5J (US Government, approved for public release).
 - Nothing is estimated. Missing data is shown as missing.
 
-Current coverage: 14 aluminum, steel, stainless and titanium grades, room-temperature properties.
+Current coverage: 25 aluminum, steel, stainless (incl. 304/316), titanium and superalloy grades, room-temperature properties. Source: MIL-HDBK-5J (2003, superseded by MMPDS; values may differ from current data). You can add your own datasheet values.
 
 **Advisory only.** A screening aid, not a material approval, design allowable or certification. Verify every value before use in a design.
 
