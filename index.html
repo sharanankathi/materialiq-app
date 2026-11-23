@@ -3,142 +3,299 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MaterialIQ: find the right material, with every number traced to its source</title>
-<meta name="description" content="Free early-access tool for mechanical engineers: screen metals against your part's limits and get a ranked shortlist where every value links to its handbook source.">
+<title>MaterialIQ: pick a metal you can defend</title>
+<meta name="description" content="Free early-access tool for mechanical engineers: set your part's limits, watch the material chart narrow, and get a ranked shortlist where every value links to its handbook page.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@200..700&family=Michroma&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--ink:#1C1C1E;--muted:#5E5E66;--line:#ECECEF;--bg:#FAFAFA;--accent:#C2410C;--accentSoft:#FFF1EA;--fail:#A12B2B;--warn:#8A5300}
+:root{color-scheme:dark;
+  --bg:#000;--surface:#0A0A0B;--raise:#111113;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.16);
+  --text:#EDEDED;--dim:#9B9BA1;--muted:#6E6E75;--red:#FF3B30;--redInk:#FF6B61;--redSoft:rgba(255,59,48,.12);
+  --pass:#3DDC84;--fail:#FF6B61;--warn:#F5B547;--r:10px;
+  --wide:'Michroma','Geist',sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,Poppins,'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
-a{color:var(--accent)}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Geist,'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.55;font-weight:350;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:var(--redInk)}
 button,input,select{font:inherit;color:inherit}
-.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
-header{background:#fff;border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:19px;letter-spacing:-.03em}
-.beta{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--accent);background:var(--accentSoft);border-radius:999px;padding:4px 10px}
-.verified{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
-.vdot{width:8px;height:8px;border-radius:999px;background:#2F8A57;display:inline-block}
-.intro{text-align:center;padding:40px 0 22px}
-.intro h1{margin:0;font-size:40px;font-weight:700;letter-spacing:-.035em;line-height:1.12}
-.intro p{margin:12px auto 0;max-width:640px;color:#3D3D45;font-size:16px}
-.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:18px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.field{display:flex;flex-direction:column;gap:6px}
-.lab{font-size:12px;font-weight:600;color:#3B3B44}
-input[type=text],input[type=number],select{padding:10px 12px;border:1px solid #D9D9DE;border-radius:10px;background:#fff;min-height:44px}
-input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.limit{display:grid;grid-template-columns:minmax(0,2.2fr) 70px minmax(0,1.2fr) minmax(0,1fr) 44px;gap:8px;align-items:center}
-.iconbtn{width:44px;height:44px;border:1px solid #D9D9DE;background:#fff;border-radius:10px;cursor:pointer;font-size:18px;color:var(--muted)}
-.ghost{border:1px dashed #C9C9D0;background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;color:var(--accent);font-weight:600;text-align:left;min-height:44px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.tog{border:1px solid #D9D9DE;background:#fff;border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:14px;min-height:44px}
-.tog[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.primary{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 22px;font-weight:700;font-size:16px;cursor:pointer;min-height:48px}
-.secondary{background:#fff;border:1px solid #D9D9DE;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
-.examples{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
-.examples button{border:0;background:var(--accentSoft);color:#8F3408;border-radius:999px;padding:7px 12px;font-weight:600;cursor:pointer;min-height:36px}
-.err{color:var(--fail);font-size:13px;font-weight:600}
-#results{padding:34px 0 10px}
-.hero{text-align:center;margin-bottom:22px}
-.eyebrow{font-size:13px;font-weight:600;color:var(--muted)}
-.hero h2{margin:6px 0 8px;font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1.15}
-.lede{margin:0 auto;max-width:720px;color:#3D3D45}
-.legend{font-size:12px;color:var(--muted);margin-top:10px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:999px;background:var(--accent);margin-right:7px;vertical-align:middle}
-.podium{display:flex;justify-content:center;align-items:flex-start;gap:18px;flex-wrap:wrap;margin:10px 0 26px}
-.col{flex:1 1 260px;max-width:330px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 22px 22px;margin-top:32px}
-.col.lead{max-width:380px;border:2px solid var(--accent);margin-top:0;box-shadow:0 18px 48px rgba(28,28,30,.12)}
-.badge{display:block;width:max-content;margin:0 auto 12px;font-size:11px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:999px;background:#F2F2F4}
-.col.lead .badge{background:var(--accent);color:#fff}
-.pic{background:#F7F7F8;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:14px 10px}
-.name{text-align:center;margin-top:12px}
-.name h3{margin:0;font-size:21px;font-weight:700;letter-spacing:-.03em}
-.col.lead .name h3{font-size:26px}
-.name p{margin:2px 0 0;font-size:12px;color:var(--muted)}
-.row{border-top:1px solid var(--line);padding:10px 0}
-.row .l{font-size:11px;color:var(--muted)}
-.val{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.num{font-size:19px;font-weight:600;letter-spacing:-.01em}
-.col.lead .num{font-size:22px}
-.num.best{font-weight:800}
-.src{border:0;background:#F2F2F4;color:#55555E;border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;min-height:24px}
-.src:hover{background:var(--accentSoft);color:#8F3408}
-section.block{margin-top:22px}
-section.block h3{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
-th{text-align:left;font-weight:600;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line)}
-td{padding:8px;border-bottom:1px solid #F3F3F5;vertical-align:top}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px;position:relative}
+.label{font-family:var(--wide);font-size:11px;color:var(--red);letter-spacing:.02em}
+
+/* hero */
+.top{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.top::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent calc(50% - .5px),var(--line) calc(50% - .5px),var(--line) calc(50% + .5px),transparent calc(50% + .5px)),
+  linear-gradient(transparent 118px,var(--line) 118px,var(--line) 119px,transparent 119px)}
+.ghost{position:absolute;left:-1vw;top:250px;font-family:var(--wide);font-size:15.5vw;line-height:1;color:rgba(255,255,255,.022);white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-.02em}
+nav.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:34px 0 0;position:relative;z-index:2}
+.brand{font-family:var(--wide);font-size:17px;color:var(--red);letter-spacing:.01em}
+.navr{display:flex;gap:22px;align-items:center;font-size:13px;color:var(--dim)}
+.navr a{color:var(--text);text-decoration:none}
+.navr a:hover{color:var(--red)}
+.beta{font-size:12px;color:var(--text);border:1px solid var(--line2);border-radius:999px;padding:3px 11px}
+.herogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;position:relative;z-index:1;min-height:640px}
+.hcopy{padding:70px 0 60px;display:flex;flex-direction:column}
+.count{display:flex;align-items:center;gap:22px;margin:6px 0 0 120px}
+.count .dash{width:40px;height:2px;background:#3A3A3F}
+.count .out{font-family:var(--wide);font-size:84px;line-height:1;color:transparent;-webkit-text-stroke:1.2px #4A4A50;letter-spacing:-.02em}
+.count .cap{font-size:12px;color:var(--muted);max-width:14ch;line-height:1.35}
+h1{margin:70px 0 0;font-size:clamp(30px,3.4vw,46px);font-weight:400;letter-spacing:-.025em;line-height:1.12;max-width:15ch}
+h1 .g{color:#8D8D93}
+.hcopy .sub{margin:26px 0 0 130px;max-width:40ch;color:var(--dim);font-size:15px}
+.feats{margin:70px 0 0;max-width:470px}
+.feat{padding:16px 0;border-top:1px solid var(--line);font-size:14px;color:var(--dim)}
+.feat:first-child{border-top:0}
+.feat b{font-family:var(--wide);font-weight:400;font-size:12px;color:var(--text);margin-right:4px}
+.ctas{display:flex;gap:10px;margin-top:34px;flex-wrap:wrap}
+
+.hvis{position:relative;align-self:stretch;min-height:560px}
+.stage{position:absolute;right:-40px;top:20px;width:min(640px,100%);aspect-ratio:600/600}
+.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.co{position:absolute;width:27%;border:1px solid var(--line2);background:rgba(14,14,16,.82);backdrop-filter:blur(6px);border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--dim);line-height:1.4}
+.co .k{font-family:var(--wide);font-size:9.5px;color:var(--text);display:block;margin-bottom:5px}
+.co .v{display:block;font-size:20px;color:var(--text);font-weight:450;letter-spacing:-.01em;margin-bottom:3px}
+.co .v.red{color:var(--red);font-size:16px;line-height:1.25}
+#co1{left:73%;top:9%}#co2{left:0;top:40%}#co3{left:73%;top:61%}
+
+/* buttons + inputs */
+.primary{background:var(--red);color:#fff;border:0;border-radius:6px;padding:12px 20px;font-weight:550;font-size:14px;cursor:pointer;min-height:46px}
+.primary:hover{background:#FF5146}
+.light{background:#fff;color:#000;border:0;border-radius:6px;padding:12px 20px;font-weight:550;font-size:14px;cursor:pointer;min-height:46px;text-decoration:none;display:inline-flex;align-items:center}
+.secondary{background:transparent;border:1px solid var(--line2);border-radius:6px;padding:10px 16px;font-weight:500;cursor:pointer;min-height:44px;color:var(--text)}
+.secondary:hover{border-color:var(--text)}
+input[type=text],input[type=number],select{padding:9px 11px;border:1px solid #2A2A2F;border-radius:6px;background:#0E0E10;min-height:44px;width:100%;color:var(--text)}
+select option{background:#111}
+input::placeholder{color:#5A5A61}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* workbench */
+.sect{padding:90px 0 0}
+.secthead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;margin-bottom:34px}
+.secthead h2{margin:10px 0 0;font-size:clamp(24px,2.4vw,32px);font-weight:400;letter-spacing:-.02em;line-height:1.15}
+.secthead p{margin:30px 0 0;color:var(--dim);max-width:52ch;font-size:14px}
+.bench{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;align-items:start}
+.spec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.spec .titleblock{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding:14px 18px}
+.spec .titleblock b{font-family:var(--wide);font-weight:400;font-size:11px}
+.spec .titleblock span{font-size:12px;color:var(--muted)}
+.specbody{padding:16px 18px 18px;display:flex;flex-direction:column;gap:16px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:7px}
+.lab{font-size:12.5px;font-weight:500;color:var(--text)}
+.hint{font-size:12px;color:var(--muted);font-weight:350}
+.limit{display:grid;grid-template-columns:minmax(0,1.7fr) 56px minmax(0,1fr) 92px 40px;gap:6px;align-items:center}
+.iconbtn{width:40px;height:44px;border:1px solid #2A2A2F;background:#0E0E10;border-radius:6px;cursor:pointer;font-size:18px;color:var(--muted)}
+.iconbtn:hover{color:var(--red);border-color:var(--red)}
+.ghostbtn{border:1px dashed #34343A;background:transparent;border-radius:6px;padding:9px 12px;cursor:pointer;color:var(--text);font-weight:500;text-align:left;min-height:44px}
+.ghostbtn:hover{border-color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.tog{border:1px solid #2A2A2F;background:#0E0E10;border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:450;font-size:13.5px;min-height:40px;display:inline-flex;align-items:center;gap:7px;color:var(--dim)}
+.tog[aria-pressed=true]{background:var(--text);color:#000;border-color:var(--text)}
+.tog .sw{width:9px;height:9px;border-radius:999px;display:inline-block}
+.examples{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.examples button{border:1px solid #2A2A2F;background:transparent;color:var(--text);border-radius:999px;padding:5px 12px;font-weight:450;cursor:pointer;min-height:32px;font-size:12.5px}
+.examples button:hover{border-color:var(--red);color:var(--red)}
+.err{color:var(--fail);font-size:13px;font-weight:500}
+
+.chartwrap{position:sticky;top:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 14px;margin:0}
+.charthead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.tally{font-size:14px;color:var(--dim)}
+.tally b{font-family:var(--wide);font-weight:400;font-size:28px;color:var(--text);margin-right:6px}
+.axes{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.axes select{min-height:34px;padding:4px 8px;font-size:13px;width:auto}
+#chart{display:block;width:100%;height:auto;margin-top:8px;touch-action:manipulation}
+#chart .pt{cursor:pointer}#chart .pt:focus{outline:none}
+#chart .pt:focus-visible circle.hit{stroke:var(--red);stroke-width:2.5}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);margin-top:8px;align-items:center}
+.legend i{display:inline-block;vertical-align:-2px;margin-right:5px}
+.offaxis{font-size:12px;color:var(--muted);margin:6px 0 0}
+.tip{position:absolute;pointer-events:none;background:#fff;color:#000;font-size:12px;border-radius:6px;padding:7px 9px;line-height:1.35;max-width:230px;transform:translate(-50%,calc(-100% - 12px));opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+
+/* results */
+#results{padding:90px 0 10px}
+.verdict{margin-bottom:30px;max-width:900px}
+.verdict .kicker{font-family:var(--wide);font-size:11px;color:var(--red)}
+.verdict h2{margin:12px 0 0;font-size:clamp(30px,4vw,52px);font-weight:400;letter-spacing:-.03em;line-height:1.05}
+.lede{margin:12px 0 0;max-width:66ch;color:var(--dim);font-size:15px}
+.keyline{font-size:12px;color:var(--muted);margin-top:10px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:999px;background:var(--red);margin-right:6px;vertical-align:middle}
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:16px;margin:8px 0 30px}
+.podium.n1{grid-template-columns:minmax(0,440px)}.podium.n2{grid-template-columns:1.15fr 1fr;max-width:900px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px 6px;position:relative;overflow:hidden}
+.col.lead{border-color:rgba(255,59,48,.55);background:radial-gradient(120% 60% at 50% 115%,rgba(255,59,48,.22),transparent 60%),var(--surface)}
+.place{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.place .n{font-family:var(--wide);font-size:46px;line-height:1;color:transparent;-webkit-text-stroke:1.1px #45454B}
+.col.lead .place .n{-webkit-text-stroke:1.2px var(--red);font-size:58px}
+.place .t{font-family:var(--wide);font-size:10px;color:var(--muted);padding-top:6px}
+.col.lead .place .t{color:var(--red)}
+.pic{display:flex;align-items:center;justify-content:center;padding:6px 4px 0}
+.name h3{margin:4px 0 0;font-size:21px;font-weight:450;letter-spacing:-.015em;line-height:1.15}
+.col.lead .name h3{font-size:25px}
+.name p{margin:3px 0 8px;font-size:12px;color:var(--muted)}
+.famtag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+.row{border-top:1px solid var(--line);padding:10px 0;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.row .l{font-size:12px;color:var(--muted)}
+.val{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.num{font-size:18px;font-weight:450}
+.col.lead .num{font-size:21px}
+.num.best{color:#fff;font-weight:600}
+.src{border:1px solid #2A2A2F;background:transparent;color:var(--dim);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer;min-height:24px}
+.src:hover{border-color:var(--red);color:var(--red)}
+section.block{margin-top:34px}
+section.block h3{font-family:var(--wide);font-weight:400;font-size:12px;color:var(--red);margin:0 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 18px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th{text-align:left;font-weight:450;font-size:12px;color:var(--muted);padding:9px 8px;border-bottom:1px solid var(--line2)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
-.fail{color:var(--fail);font-weight:600}.warn{color:var(--warn);font-weight:600}
-ul{margin:4px 0 0;padding-left:18px}li{margin:3px 0}
-.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 8px}
-.none{background:#fff;border:2px solid var(--accent);border-radius:22px;padding:24px;text-align:center;margin-bottom:24px}
-footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px}
-dialog{border:0;border-radius:20px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 30px 80px rgba(0,0,0,.25)}
-dialog::backdrop{background:rgba(28,28,30,.45)}
-.dlg{padding:24px}
-.dlg h4{margin:0 0 4px;font-size:20px;letter-spacing:-.02em}
+.fail{color:var(--fail);font-weight:500}.warn{color:var(--warn);font-weight:500}
+ul{margin:4px 0 0;padding-left:18px;color:var(--dim)}li{margin:5px 0}li b{color:var(--text);font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:34px 0 8px;align-items:center}
+.none{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:20px;margin-bottom:24px}
+.fb{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:24px;padding:14px 18px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.fb b{font-weight:500}
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);margin-top:90px;padding:30px 0 50px;background:#060607}
+footer .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+footer .fbrand{font-family:var(--wide);font-size:13px;color:var(--text);margin:0 0 10px}
+footer p{margin:0 0 10px;max-width:70ch}
+dialog{border:1px solid var(--line2);border-radius:var(--r);padding:0;max-width:520px;width:calc(100% - 32px);background:#0D0D0F;color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.dlg{padding:22px}
+.dlg h4{margin:0 0 4px;font-size:21px;font-weight:450;letter-spacing:-.015em}
 .dlg dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:16px 0}
-.dlg dt{font-size:11px;color:var(--muted)}.dlg dd{margin:0;font-weight:600;font-size:14px}
-.okstamp{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2F8A57;background:#EAF6EF;border-radius:999px;padding:4px 10px}
-.srcbox{background:#F7F7F8;border-radius:12px;padding:12px 14px;font-size:13px}
+.dlg dt{font-size:12px;color:var(--muted)}.dlg dd{margin:0;font-weight:500;font-size:14px}
+.okstamp{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--pass);border:1px solid rgba(61,220,132,.35);border-radius:999px;padding:3px 10px}
+.srcbox{background:#141417;border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-size:13px;color:var(--dim)}
+.srcbox b{color:var(--text);font-weight:500}
 .hide{display:none}
-@media (max-width:720px){.intro h1{font-size:30px}.wrap{padding:0 14px}.panel{padding:18px 16px}.limit{grid-template-columns:58px minmax(0,1fr) 96px 44px;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line)}.limit .prop{grid-column:1/-1}.grid2{grid-template-columns:1fr}.hero h2{font-size:28px}.col.lead{order:-1}.col{margin-top:0}.verified{display:none}}
-@media print{header,#inputs,.intro,.actions,footer .nop,dialog{display:none!important}body{background:#fff;font-size:12px}
-.podium{flex-wrap:nowrap;gap:10px}.col,.col.lead{flex:1 1 0;min-width:0;max-width:none;padding:14px}.col{margin-top:22px}.col.lead{margin-top:0;box-shadow:none}
-.src{background:none;padding:0}.card,.col,section.block{break-inside:avoid}#printsrc{display:block!important}}
+@media (max-width:1060px){.herogrid{grid-template-columns:1fr;min-height:0}.hvis{min-height:0;height:min(92vw,560px)}.stage{position:relative;right:auto;top:0;margin:0 auto;width:min(560px,100%)}
+  .bench{grid-template-columns:1fr}.chartwrap{position:static}.secthead{grid-template-columns:1fr;gap:0}.secthead p{margin-top:12px}.top::before{display:none}.hcopy{padding-bottom:10px}}
+@media (max-width:720px){.wrap{padding:0 16px}.count{margin-left:0}.count .out{font-size:60px}.hcopy .sub{margin-left:0}h1{margin-top:40px}.feats{margin-top:36px}
+  .co{width:34%;padding:8px 9px;font-size:10.5px}.co .v{font-size:15px}.co .k{font-size:8.5px}#co1{left:66%}#co3{left:66%}
+  .specbody{padding:14px}.limit{grid-template-columns:58px minmax(0,1fr) 92px 40px;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line)}.limit .prop{grid-column:1/-1}.grid2{grid-template-columns:1fr}
+  .podium,.podium.n2{grid-template-columns:1fr}.col.lead{order:-1}.navr .hidem{display:none}.chartwrap{padding:12px}footer .wrap{grid-template-columns:1fr;gap:10px}.sect,#results{padding-top:60px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{:root{color-scheme:light;--bg:#fff;--surface:#fff;--raise:#fff;--line:#DDD;--line2:#BBB;--text:#111;--dim:#333;--muted:#666;--red:#C8261C;--redInk:#C8261C}
+  body{font-size:12px}.top,#inputs,.secthead,.actions,.fb,footer .nop,dialog,.axes,.tip{display:none!important}
+  .sect{padding-top:0}.bench{grid-template-columns:1fr}.chartwrap{position:static;border:0;padding:0;break-inside:avoid}#chart{max-height:330px}#results{padding-top:20px}
+  .podium{grid-template-columns:1fr 1.1fr 1fr!important;gap:10px}.col{padding:12px}.col.lead{background:#fff}
+  .place .n{-webkit-text-stroke:1px #999}.col.lead .place .n{-webkit-text-stroke:1px #C8261C}
+  .src{border:0;padding:0}.card,.col,section.block{break-inside:avoid}#printsrc{display:block!important}footer{background:#fff}}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-  <div class="brand"><svg width="24" height="24" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="14" width="7" height="11" rx="2" fill="#1C1C1E"/><rect x="9.5" y="5" width="7" height="20" rx="2" fill="#C2410C"/><rect x="18" y="10" width="7" height="15" rx="2" fill="#1C1C1E"/></svg>MaterialIQ <span class="beta">FREE EARLY ACCESS</span></div>
-  <div class="verified"><span class="vdot"></span><span id="datastat">Every value verified against its source</span></div>
-</div></header>
+<div class="top">
+  <div class="ghost" aria-hidden="true">MATERIALIQ</div>
+  <div class="wrap">
+    <nav class="bar">
+      <span class="brand">MaterialIQ</span>
+      <div class="navr"><a href="#bench" class="hidem">Screen materials</a><a href="#how" class="hidem">How it works</a><span class="beta">Free early access</span></div>
+    </nav>
+    <div class="herogrid">
+      <div class="hcopy">
+        <div class="count" aria-hidden="true"><span class="dash"></span><span class="out" id="nmat">14</span><span class="cap" id="ncap">metals, every value traced to its source</span></div>
+        <h1><span class="g">Material selection.</span> Every number traced to its page.</h1>
+        <p class="sub">Set your part's limits. Get a ranked shortlist of metals where each value links to the exact table and page in MIL-HDBK-5J.</p>
+        <div class="feats" id="how">
+          <div class="feat"><b>Source-traced.</b> Each property opens its handbook table, page and basis, checked against the PDF.</div>
+          <div class="feat"><b>Conservative.</b> Guaranteed minimums (A- or S-basis), worst case across sources, like-for-like temperature.</div>
+          <div class="feat"><b>Nothing invented.</b> Missing data stays missing and is flagged, never estimated.</div>
+        </div>
+        <div class="ctas"><a class="light" href="#bench">Screen materials</a><button type="button" class="primary" data-ex="bracket" data-jump="1">Try the bracket example</button></div>
+      </div>
+      <div class="hvis" aria-hidden="true">
+        <div class="stage">
+          <svg viewBox="0 0 600 600">
+            <defs>
+              <linearGradient id="bodyG" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stop-color="#050506"/><stop offset=".14" stop-color="#1B1C1F"/><stop offset=".3" stop-color="#6E7178"/><stop offset=".36" stop-color="#A9ADB4"/><stop offset=".44" stop-color="#3A3C41"/><stop offset=".72" stop-color="#121214"/><stop offset=".9" stop-color="#26272B"/><stop offset="1" stop-color="#060607"/>
+              </linearGradient>
+              <linearGradient id="fade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset=".22" stop-color="#000" stop-opacity="0"/></linearGradient>
+              <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FF3B30" stop-opacity=".55"/><stop offset=".45" stop-color="#C2200F" stop-opacity=".22"/><stop offset="1" stop-color="#FF3B30" stop-opacity="0"/></radialGradient>
+              <radialGradient id="face" cx=".42" cy=".4" r=".7"><stop offset="0" stop-color="#4A4C52"/><stop offset=".6" stop-color="#1C1D20"/><stop offset="1" stop-color="#0A0A0B"/></radialGradient>
+              <filter id="blur"><feGaussianBlur stdDeviation="14"/></filter>
+            </defs>
+            <ellipse cx="300" cy="512" rx="250" ry="52" fill="#0B0B0C" stroke="rgba(255,255,255,.07)"/>
+            <ellipse cx="300" cy="488" rx="210" ry="58" fill="url(#glow)" filter="url(#blur)"/>
+            <path d="M190 -10 H410 V470 A110 26 0 0 1 190 470 Z" fill="url(#bodyG)"/>
+            <path d="M190 470 A110 26 0 0 0 410 470" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.2"/>
+            <g fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1">
+              <path d="M190 420 A110 26 0 0 0 410 420"/><path d="M190 426 A110 26 0 0 0 410 426"/>
+              <path d="M190 150 A110 26 0 0 0 410 150"/>
+            </g>
+            <path d="M190 470 A110 26 0 0 0 410 470 L410 476 A110 26 0 0 1 190 476 Z" fill="#FF3B30" opacity=".35"/>
+            <text id="etch" x="0" y="0" transform="translate(336 400) rotate(-90)" font-family="Michroma, sans-serif" font-size="15" fill="rgba(255,255,255,.16)" letter-spacing="2">TI-6AL-4V</text>
+            <rect x="0" y="0" width="600" height="600" fill="url(#fade)"/>
+            <g stroke="rgba(255,255,255,.35)" stroke-width="1" fill="none">
+              <polyline points="398,118 420,118 436,104"/><polyline points="202,282 184,282 168,268"/><polyline points="406,392 424,392 436,378"/>
+            </g>
+            <g fill="#fff"><circle cx="398" cy="118" r="3"/><circle cx="202" cy="282" r="3"/><circle cx="406" cy="392" r="3"/></g>
+          </svg>
+          <div class="co" id="co1"><span class="k">Current best match</span><span class="v red" id="co1v">-</span><span id="co1s"></span></div>
+          <div class="co" id="co2"><span class="k" id="co2k">Yield strength</span><span class="v" id="co2v">-</span><span id="co2s"></span></div>
+          <div class="co" id="co3"><span class="k" id="co3k">Density</span><span class="v" id="co3v">-</span><span id="co3s"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <main class="wrap">
-  <div class="intro">
-    <h1>Find the right metal in seconds.<br>Trust every number.</h1>
-    <p>Enter your part's must-meet limits. Get a ranked podium where every value links to the exact handbook table and page it came from.</p>
-  </div>
-
-  <form id="inputs" class="panel" novalidate>
-    <div class="examples"><span>Try an example:</span>
+  <section class="sect" id="bench">
+    <div class="secthead">
+      <div><span class="label">Screening workbench</span><h2>Set the limits. Watch the field narrow.</h2></div>
+      <p>Each limit cuts a hatched zone out of the chart. Metals that pass stay lit, failures are crossed out, and the best match turns red. Hover any point for its values.</p>
+    </div>
+  <div class="bench">
+  <form id="inputs" class="spec" novalidate>
+    <div class="titleblock"><b>Part requirements</b><span>Updates the chart as you type</span></div>
+    <div class="specbody">
+    <div class="examples"><span>Start from:</span>
       <button type="button" data-ex="bracket">Lightweight bracket</button>
       <button type="button" data-ex="stiff">Stiff, light frame</button>
       <button type="button" data-ex="tough">Tough stainless part</button>
     </div>
     <div class="grid2">
       <div class="field"><label class="lab" for="part">Part</label><input id="part" type="text" placeholder="e.g. sensor mounting bracket"></div>
-      <div class="field"><label class="lab" for="temp">Operating temperature (°C)</label><input id="temp" type="number" step="any" value="23"></div>
+      <div class="field"><label class="lab" for="temp">Temperature, °C</label><input id="temp" type="number" step="any" value="23"></div>
     </div>
     <div class="field">
       <span class="lab" id="limits-lab">Must-meet limits</span>
       <div id="limits" role="group" aria-labelledby="limits-lab" style="display:flex;flex-direction:column;gap:8px"></div>
-      <button type="button" class="ghost" id="addlim">+ Add limit</button>
+      <button type="button" class="ghostbtn" id="addlim">+ Add a limit</button>
     </div>
-    <div class="grid2">
-      <div class="field"><span class="lab" id="opt-lab">Optimize for</span>
-        <div class="chips" role="group" aria-labelledby="opt-lab" id="objs"></div></div>
-      <div class="field"><span class="lab" id="fam-lab">Material families</span>
-        <div class="chips" role="group" aria-labelledby="fam-lab" id="fams"></div></div>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <div class="field"><span class="lab" id="opt-lab">Rank by <span class="hint">what matters most once a metal passes</span></span>
+      <div class="chips" role="group" aria-labelledby="opt-lab" id="objs"></div></div>
+    <div class="field"><span class="lab" id="fam-lab">Families to consider</span>
+      <div class="chips" role="group" aria-labelledby="fam-lab" id="fams"></div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
       <span id="formerr" class="err" role="alert"></span>
-      <button type="submit" class="primary">Find materials →</button>
+      <button type="submit" class="primary">See the ranking</button>
+    </div>
     </div>
   </form>
 
-  <div id="results" aria-live="polite"></div>
+  <figure class="chartwrap" aria-labelledby="tally">
+    <div class="charthead">
+      <div class="tally" id="tally"></div>
+      <div class="axes"><label for="ay">Up</label><select id="ay"></select><label for="ax">Across</label><select id="ax"></select></div>
+    </div>
+    <div style="position:relative"><svg id="chart" viewBox="0 0 680 470" role="img" aria-label="Material property chart"></svg><div class="tip" id="tip" role="status"></div></div>
+    <div class="legend" id="legend"></div>
+    <p class="offaxis" id="offaxis"></p>
+  </figure>
+  </div>
+  </section>
 
-  <footer>
-    <p><b>Advisory only.</b> MaterialIQ is a screening aid, not a material approval, design allowable or certification. Not for aerospace, medical-device or pressure-vessel parts. Verify every value and assumption before use in a design.</p>
-    <p id="coverage"></p>
-    <p class="nop">Early access while the app is being built. Feedback shapes what comes next: <a id="fb" href="#" target="_blank" rel="noopener">send feedback</a>.</p>
-  </footer>
+  <div id="results" aria-live="polite"></div>
 </main>
+
+<footer><div class="wrap">
+  <div><p class="fbrand">MaterialIQ</p><p id="coverage"></p><p class="nop">Early access while the app is being built. Feedback decides what comes next: <a id="fb" href="#" target="_blank" rel="noopener">send feedback</a>.</p></div>
+  <div><p><b style="color:var(--text);font-weight:500">Advisory only.</b> MaterialIQ is a screening aid, not a material approval, design allowable or certification. Not for aerospace, medical-device or pressure-vessel parts. Verify every value and assumption before use in a design.</p></div>
+</div></footer>
 
 <dialog id="dlg" aria-labelledby="dlg-h"><div class="dlg" id="dlgbody"></div></dialog>
 
@@ -345,6 +502,10 @@ const OBJ = {
   ductile:{label:"More ductile", property:"elongation", goal:"max", units:"%"},
 };
 const FAM = {aluminum:"Aluminum", steel:"Steel", stainless:"Stainless", titanium:"Titanium"};
+const FCOL = {aluminum:"#7FA8DE", steel:"#9AA0A8", stainless:"#5FC4B8", titanium:"#B49CF0"};
+const DARK = {plot:"#060607", grid:"#1C1C1F", tick:"#76767D", ink:"#E6E6E6", signal:"#FF3B30", faint:"#55555B", hole:"#060607"};
+const LIGHT = {plot:"#FFFFFF", grid:"#E5E5E5", tick:"#555555", ink:"#111111", signal:"#C8261C", faint:"#9A9A9A", hole:"#FFFFFF"};
+let TH = DARK;
 const TONE = {titanium:["#6E7886","#9AA5B2","#E3E8EE","#B7C0CB"], stainless:["#7B8187","#A9AFB4","#F0F2F3","#C7CCD0"],
   steel:["#5F656B","#8C9298","#DCE0E3","#A9AFB4"], aluminum:["#9FA7AE","#C9CFD4","#F6F8F9","#DDE2E6"]};
 const EXAMPLES = {
@@ -371,24 +532,28 @@ function limitRow(p, op, v, u){
   const fill = () => { us.innerHTML = PROPS[ps.value].units.map(x => `<option value="${x}">${ul(x)}</option>`).join(""); };
   ps.value = p || "yield_strength"; fill(); if (u) us.value = u;
   d.querySelector(".op").value = op || ">="; if (v != null) d.querySelector(".v").value = v;
-  ps.addEventListener("change", fill);
-  d.querySelector(".iconbtn").addEventListener("click", () => d.remove());
+  ps.addEventListener("change", () => { fill(); live(); });
+  d.querySelector(".iconbtn").addEventListener("click", () => { d.remove(); live(); });
   $("limits").appendChild(d);
 }
 function chips(el, map, set){
-  el.innerHTML = Object.entries(map).map(([k,x]) => `<button type="button" class="tog" data-k="${k}" aria-pressed="${set.has(k)}">${esc(x.label || x)}</button>`).join("");
+  el.innerHTML = Object.entries(map).map(([k,x]) => `<button type="button" class="tog" data-k="${k}" aria-pressed="${set.has(k)}">${FCOL[k] ? `<span class="sw" style="background:${FCOL[k]}"></span>` : ""}${esc(x.label || x)}</button>`).join("");
   el.querySelectorAll(".tog").forEach(b => b.addEventListener("click", () => {
-    const k = b.dataset.k; set.has(k) ? set.delete(k) : set.add(k); b.setAttribute("aria-pressed", set.has(k));
+    const k = b.dataset.k; set.has(k) ? set.delete(k) : set.add(k); b.setAttribute("aria-pressed", set.has(k)); live();
   }));
 }
 function loadExample(k, scroll = true){
   const x = EXAMPLES[k]; $("part").value = x.part; $("temp").value = x.temp; $("limits").innerHTML = "";
   x.limits.forEach(l => limitRow(...l)); objsOn = new Set(x.objs); famsOn = new Set(x.fams);
-  chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn); run(scroll);
+  chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn); axisTouched = false; run(scroll, false);
 }
 document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", () => { track("example-" + b.dataset.ex); loadExample(b.dataset.ex, true); }));
-$("addlim").addEventListener("click", () => limitRow());
-$("inputs").addEventListener("submit", e => { e.preventDefault(); run(true); });
+$("addlim").addEventListener("click", () => { limitRow(); const r = $("limits").lastElementChild; r && r.querySelector(".v").focus(); });
+$("inputs").addEventListener("submit", e => { e.preventDefault(); run(true, true); });
+let liveT = 0;
+function live(){ clearTimeout(liveT); liveT = setTimeout(() => run(false, false), 220); }
+$("inputs").addEventListener("input", e => { if (e.target.matches("input")) live(); });
+$("inputs").addEventListener("change", e => { if (e.target.matches(".op,.unit")) live(); });
 
 function collect(){
   const t = $("temp").value.trim();
@@ -430,17 +595,17 @@ function podiumRows(res, top){
 }
 function column(m, slot, lead, rows, label){
   const cells = rows.map(r => { const [v, ids] = r.cells[slot], b = r.best.has(slot);
-    return `<div class="row"><div class="l">${esc(r.label)}, ${esc(ul(r.unit))}</div><div class="val"><span class="num${b?" best":""}">${b?'<span class="dot"></span>':""}${esc(fmt(v))}</span>${srcBtns(ids)}</div></div>`; }).join("");
-  return `<article class="col${lead?" lead":""}"><span class="badge">${esc(label)}</span><div class="pic">${picture(m, lead?260:220)}</div>
-    <div class="name"><h3>${esc(m.label)}</h3><p>${esc(m.product_form)} · ${esc(m.condition)}</p></div>${cells}</article>`;
+    return `<div class="row"><div class="l">${esc(r.label)}<br>${esc(ul(r.unit))}</div><div class="val"><span class="num${b?" best":""}">${b?'<span class="dot"></span>':""}${esc(fmt(v))}</span>${srcBtns(ids)}</div></div>`; }).join("");
+  return `<article class="col${lead?" lead":""}"><div class="place"><span class="n">${slot+1}</span><span class="t">${esc(label)}</span></div><div class="pic">${picture(m, lead?240:200)}</div>
+    <div class="name"><span class="famtag"><span class="dot" style="background:${FCOL[m.family]||"#888"}"></span>${esc(FAM[m.family]||m.family)}</span><h3>${esc(m.label)}</h3><p>${esc(m.product_form)}, ${esc(m.condition)}</p></div>${cells}</article>`;
 }
 
-function run(scroll = true){
+function run(scroll = true, tracked = true){
   $("formerr").textContent = "";
   const c = collect(); if (c.err){ $("formerr").textContent = c.err; return; }
   let res; try { res = E.screen(c.req); } catch (e){ $("formerr").textContent = "Couldn't screen: " + e.message; return; }
-  render(res, c.req);
-  track(res.by_outcome(C.CANDIDATE).length ? "run-result" : "run-no-result");
+  render(res, c.req); drawChart(res, c.req); heroUpdate(res);
+  if (tracked) track(res.by_outcome(C.CANDIDATE).length ? "run-result" : "run-no-result");
   if (scroll) $("results").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
@@ -455,15 +620,15 @@ function render(res, input){
     lede = ranked[0].label + " and " + ranked[1].label + " are within 5% on your goals. Choose between them on cost, machinability or availability."; }
   else if (cands.length === 1){ eyebrow = "1 of " + n + " materials qualifies"; h = ranked[0].label; lede = "The only material that meets every limit you set."; }
   else { eyebrow = "Best match out of " + n + " materials"; h = ranked[0].label; lede = "Best balance of " + goals + " among the " + cands.length + " materials that meet every limit."; }
-  const out = [`<div class="hero"><div class="eyebrow">${esc(eyebrow)}</div><h2>${esc(h)}</h2><p class="lede">${esc(lede)}</p>`];
-  if (ranked.length) out.push(`<div class="legend"><span class="dot"></span>marks the best value in each row · click any grey code to see the handbook source</div>`);
+  const out = [`<div class="verdict"><div class="kicker">${esc(eyebrow)}</div><h2>${esc(h)}</h2><p class="lede">${esc(lede)}</p>`];
+  if (ranked.length) out.push(`<div class="keyline"><span class="dot"></span>Best value in each row. Click any reference code to open its handbook page.</div>`);
   out.push("</div>");
   if (ranked.length){
     const top = ranked.slice(0,3), rows = podiumRows(res, top), order = top.length === 3 ? [1,0,2] : top.map((_,i) => i);
-    const labels = {0: res.tie ? "TIED FOR #1" : "#1 BEST MATCH", 1: res.tie ? "TIED FOR #1" : "#2", 2:"#3"};
-    out.push(`<div class="podium">${order.map(i => column(top[i], i, i === 0, rows, labels[i])).join("")}</div>`);
+    const labels = {0: res.tie ? "Tied for first" : "Best match", 1: res.tie ? "Tied for first" : "Runner-up", 2:"Third"};
+    out.push(`<div class="podium n${top.length}">${order.map(i => column(top[i], i, i === 0, rows, labels[i])).join("")}</div>`);
     const rest = ranked.slice(3);
-    if (rest.length) out.push(`<section class="block"><h3>Also qualify</h3><div class="card"><table><tr><th>Material</th><th>Form · condition</th>${res.objectives_used.map(p => `<th>${esc(plabel(p))}</th>`).join("")}</tr>${rest.map(m => `<tr><td>${esc(m.label)}</td><td>${esc(m.product_form)} · ${esc(m.condition)}</td>${res.objectives_used.map(p => `<td>${esc(fmt(m.objective_values[p][0]))} ${srcBtns(m.objective_values[p][1])}</td>`).join("")}</tr>`).join("")}</table></div></section>`);
+    if (rest.length) out.push(`<section class="block"><h3>Also qualify</h3><div class="card"><table><tr><th>Material</th><th>Form and condition</th>${res.objectives_used.map(p => `<th>${esc(plabel(p))}</th>`).join("")}</tr>${rest.map(m => `<tr><td>${esc(m.label)}</td><td>${esc(m.product_form)}, ${esc(m.condition)}</td>${res.objectives_used.map(p => `<td>${esc(fmt(m.objective_values[p][0]))} ${srcBtns(m.objective_values[p][1])}</td>`).join("")}</tr>`).join("")}</table></div></section>`);
   } else if (cands.length){
     out.push(`<div class="none">${cands.map(m => esc(m.label)).join(", ")}</div>`);
   }
@@ -479,10 +644,9 @@ function render(res, input){
     <li>Nothing is estimated or filled in. Missing data is shown as missing.</li>
     ${[...cav].map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></section>`);
   out.push(`<div id="printsrc" class="hide"></div>`);
-  out.push(`<div class="actions"><button type="button" class="primary" id="pdf">Save as PDF</button><button type="button" class="secondary" id="edit">Edit limits</button></div><p id="pdfhint" style="text-align:center;font-size:13px;color:var(--muted);margin:0"></p>
-    <div class="card" id="fbbox" style="text-align:center;margin-top:18px"><b>Was this useful?</b>
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:10px"><button type="button" class="secondary" data-fb="yes">Yes</button><button type="button" class="secondary" data-fb="no">Not really</button></div>
-    <p id="fbthanks" style="margin:10px 0 0;font-size:14px;color:var(--muted)"></p></div>`);
+  out.push(`<div class="actions"><button type="button" class="primary" id="pdf">Save as PDF</button><button type="button" class="secondary" id="edit">Edit limits</button></div><p id="pdfhint" style="font-size:13px;color:var(--muted);margin:0"></p>
+    <div class="fb" id="fbbox"><b>Was this useful?</b><button type="button" class="secondary" data-fb="yes">Yes</button><button type="button" class="secondary" data-fb="no">Not really</button>
+    <span id="fbthanks" style="font-size:14px;color:var(--muted)"></span></div>`);
   $("results").innerHTML = out.join("");
   $("pdf").addEventListener("click", () => { track("pdf"); $("printsrc").innerHTML = printSources();
     try { window.print(); } catch (e) { /* blocked in some previews */ }
@@ -518,16 +682,182 @@ function showSource(id){
 }
 $("dlg").addEventListener("click", e => { if (e.target === $("dlg")) $("dlg").close(); });
 
+// ---------------- selection chart (Ashby-style, log-log)
+const AX = {
+  density:{label:"Density", unit:"g/cm3", ticks:[1,1.5,2,3,4,5,6,8,10,15], worst:"max"},
+  yield_strength:{label:"Yield strength", unit:"MPa", ticks:[50,100,200,300,500,700,1000,1500,2000,3000], worst:"min"},
+  tensile_strength:{label:"Tensile strength", unit:"MPa", ticks:[50,100,200,300,500,700,1000,1500,2000,3000], worst:"min"},
+  elastic_modulus:{label:"Elastic modulus", unit:"GPa", ticks:[20,30,50,70,100,150,200,300,500], worst:"min"},
+  elongation:{label:"Elongation", unit:"%", ticks:[1,2,3,5,7,10,15,20,30,50,70], worst:"min"},
+};
+const PT = {};   // material_id -> {id, short, family, v:{prop: SI value}}
+DATA.records.forEach(r => {
+  const a = AX[r.property]; if (!a || typeof r.value !== "number") return;
+  let v; try { v = E.convert(r.value, r.units, a.unit); } catch (e) { return; }
+  if (!(v > 0)) return;
+  const p = PT[r.material_id] || (PT[r.material_id] = {id:r.material_id, family:r.family,
+    short:r.designation + "-" + String(r.condition || "").split(/[\s,]/)[0], v:{}});
+  const old = p.v[r.property];
+  p.v[r.property] = old == null ? v : (a.worst === "max" ? Math.max(old, v) : Math.min(old, v));
+});
+let axisTouched = false;
+function initAxes(){
+  const opts = Object.entries(AX).map(([k,a]) => `<option value="${k}">${a.label}</option>`).join("");
+  $("ay").innerHTML = opts; $("ax").innerHTML = opts; $("ay").value = "yield_strength"; $("ax").value = "density";
+  ["ay","ax"].forEach(id => $(id).addEventListener("change", () => { axisTouched = true; track("chart-axis"); run(false, false); }));
+}
+function pickAxes(req){
+  if (axisTouched) return;
+  const ps = req.constraints.map(c => c.property).concat(req.objectives.map(o => o.property)).filter(p => AX[p] && p !== "density");
+  $("ax").value = "density"; $("ay").value = ps[0] || "yield_strength";
+}
+let lastDraw = null, rsT = 0, lastNarrow = null;
+window.addEventListener("resize", () => { clearTimeout(rsT); rsT = setTimeout(() => { const n = $("chart").parentNode.clientWidth < 560; if (lastDraw && n !== lastNarrow){ lastNarrow = n; drawChart(...lastDraw); } }, 150); });
+function drawChart(res, req){
+  pickAxes(req);
+  const xp = $("ax").value, yp = $("ay").value, ax = AX[xp], ay = AX[yp];
+  const narrow = $("chart").parentNode.clientWidth < 560, W = narrow ? 420 : 680, H = narrow ? 400 : 470, L = narrow ? 52 : 66, R = 14, T = 16, B = narrow ? 50 : 58, pw = W - L - R, ph = H - T - B;
+  $("chart").setAttribute("viewBox", `0 0 ${W} ${H}`); lastDraw = [res, req];
+  const lg = Math.log10;
+  const status = {}; res.materials.forEach(m => { status[m.material_id] = m; });
+  const lims = req.constraints.map(c => ({c, si: (() => { try { return E.convert(Number(c.value), c.units, AX[c.property] ? AX[c.property].unit : c.units); } catch (e) { return null; } })()}))
+    .filter(l => AX[l.c.property] && l.si > 0);
+  const dom = (p) => { const vs = Object.values(PT).map(q => q.v[p]).filter(v => v > 0);
+    lims.filter(l => l.c.property === p).forEach(l => vs.push(l.si));
+    let lo = Math.min(...vs) / 1.3, hi = Math.max(...vs) * 1.3; if (hi / lo < 3){ const m = Math.sqrt(hi*lo); lo = m/1.8; hi = m*1.8; } return [lg(lo), lg(hi)]; };
+  const [x0,x1] = dom(xp), [y0,y1] = xp === yp ? [x0,x1] : dom(yp);
+  const sx = v => L + (lg(v) - x0) / (x1 - x0) * pw, sy = v => T + ph - (lg(v) - y0) / (y1 - y0) * ph;
+  const o = [];
+  o.push(`<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="${TH.ink}" stroke-opacity=".22" stroke-width="1.6"/></pattern>
+    <clipPath id="plot"><rect x="${L}" y="${T}" width="${pw}" height="${ph}"/></clipPath></defs>`);
+  o.push(`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="${TH.plot}"/>`);
+  // grid + ticks
+  ax.ticks.filter(t => lg(t) >= x0 && lg(t) <= x1).forEach(t => { const x = sx(t).toFixed(1);
+    o.push(`<line x1="${x}" x2="${x}" y1="${T}" y2="${T+ph}" stroke="${TH.grid}"/><text x="${x}" y="${T+ph+18}" text-anchor="middle" font-size="12" fill="${TH.tick}">${t}</text>`); });
+  ay.ticks.filter(t => lg(t) >= y0 && lg(t) <= y1).forEach(t => { const y = sy(t).toFixed(1);
+    o.push(`<line x1="${L}" x2="${L+pw}" y1="${y}" y2="${y}" stroke="${TH.grid}"/><text x="${L-8}" y="${(+y+4).toFixed(1)}" text-anchor="end" font-size="12" fill="${TH.tick}">${t}</text>`); });
+  o.push(`<text x="${L+pw/2}" y="${H-12}" text-anchor="middle" font-size="13" font-weight="700" fill="${TH.ink}">${esc(ax.label)}, ${esc(ul(ax.unit))}</text>`);
+  o.push(`<text transform="translate(16 ${T+ph/2}) rotate(-90)" text-anchor="middle" font-size="13" font-weight="700" fill="${TH.ink}">${esc(ay.label)}, ${esc(ul(ay.unit))}</text>`);
+  o.push(`<g clip-path="url(#plot)">`);
+  // family envelopes (log-space ellipses around each family's points)
+  const envs = Object.keys(FAM).map(f => { const ps = Object.values(PT).filter(p => p.family === f && p.v[xp] > 0 && p.v[yp] > 0); if (!ps.length) return null;
+    const xs = ps.map(p => sx(p.v[xp])), ys = ps.map(p => sy(p.v[yp])), cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    return {f, cy:(Math.min(...ys) + Math.max(...ys)) / 2, crowded: cx > L + pw - (narrow ? 100 : 130)}; }).filter(Boolean);
+  Object.keys(FAM).forEach(f => {
+    const ps = Object.values(PT).filter(p => p.family === f && p.v[xp] > 0 && p.v[yp] > 0); if (!ps.length) return;
+    const xs = ps.map(p => sx(p.v[xp])), ys = ps.map(p => sy(p.v[yp]));
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    const rx = (Math.max(...xs) - Math.min(...xs)) / 2 + 26, ry = (Math.max(...ys) - Math.min(...ys)) / 2 + 22;
+    const on = famsOn.has(f);
+    o.push(`<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${(rx*1.08).toFixed(1)}" ry="${(ry*1.08).toFixed(1)}" fill="${FCOL[f]}" fill-opacity="${on ? .09 : .03}" stroke="${FCOL[f]}" stroke-opacity="${on ? .45 : .15}" stroke-width="1.2"/>`);
+    const tw = FAM[f].length * 7.4, crowded = cx > L + pw - (narrow ? 100 : 130); let lx, ly, an;
+    if (!crowded){ lx = Math.max(cx - rx * 1.08 - 6, L + 4 + tw); ly = cy + 4; an = "end"; }
+    else if (cx + rx * 1.08 + 6 + tw < L + pw){ lx = cx + rx * 1.08 + 6; ly = cy + 4; an = "start"; }
+    else { const above = !envs.some(e => e.f !== f && e.crowded && e.cy < cy); lx = cx; an = "middle";
+      ly = above ? Math.max(cy - ry * 1.08 - 7, T + 13) : Math.min(cy + ry * 1.08 + 15, T + ph - 4); }
+    o.push(`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${an}" font-size="12" font-weight="700" fill="${FCOL[f]}" fill-opacity="${on ? 1 : .35}" paint-order="stroke" stroke="${TH.plot}" stroke-width="4">${esc(FAM[f])}</text>`);
+  });
+  // limits: hatch the region each limit rules out
+  const labs = [];
+  lims.forEach(({c, si}) => {
+    const ge = c.op === ">=", tag = `${ge ? "≥" : "≤"} ${fmt(Number(c.value))} ${ul(c.units)}`;
+    if (c.property === yp){ const y = sy(si);
+      o.push(ge ? `<rect x="${L}" y="${y}" width="${pw}" height="${Math.max(0, T+ph-y)}" fill="url(#hatch)"/>` : `<rect x="${L}" y="${T}" width="${pw}" height="${Math.max(0, y-T)}" fill="url(#hatch)"/>`);
+      o.push(`<line x1="${L}" x2="${L+pw}" y1="${y}" y2="${y}" stroke="${TH.ink}" stroke-width="1.6"/>`);
+      labs.push(`<text x="${L+pw-6}" y="${(ge ? y-7 : y+16).toFixed(1)}" text-anchor="end" font-size="12" font-weight="700" fill="${TH.ink}" paint-order="stroke" stroke="${TH.plot}" stroke-width="4">${esc(tag)}</text>`); }
+    if (c.property === xp){ const x = sx(si);
+      o.push(ge ? `<rect x="${L}" y="${T}" width="${Math.max(0, x-L)}" height="${ph}" fill="url(#hatch)"/>` : `<rect x="${x}" y="${T}" width="${Math.max(0, L+pw-x)}" height="${ph}" fill="url(#hatch)"/>`);
+      o.push(`<line x1="${x}" x2="${x}" y1="${T}" y2="${T+ph}" stroke="${TH.ink}" stroke-width="1.6"/>`);
+      labs.push(`<text transform="translate(${(ge ? x+14 : x-6).toFixed(1)} ${T+8}) rotate(90)" font-size="12" font-weight="700" fill="${TH.ink}" paint-order="stroke" stroke="${TH.plot}" stroke-width="4">${esc(tag)}</text>`); }
+  });
+  // guideline: equal property-per-weight through the #1 pick
+  const ranked = res.by_outcome(C.CANDIDATE).filter(m => m.rank).sort((a,b) => a.rank - b.rank);
+  const best = ranked[0] && PT[ranked[0].material_id]; let guide = "";
+  if (best && xp === "density" && ["yield_strength","tensile_strength","elastic_modulus"].includes(yp) && best.v[xp] && best.v[yp]){
+    const k = best.v[yp] / best.v[xp], xa = 10 ** x0, xb = 10 ** x1;
+    o.push(`<line x1="${sx(xa)}" y1="${sy(k*xa)}" x2="${sx(xb)}" y2="${sy(k*xb)}" stroke="${TH.signal}" stroke-width="1.6" stroke-dasharray="6 5"/>`);
+    guide = yp === "elastic_modulus" ? "stiffness" : "strength";
+  }
+  o.push(`</g>`);
+  // points
+  const missing = [], plabs = [];
+  const order = Object.values(PT).sort((a,b) => (status[a.id] && status[a.id].rank ? 1 : 0) - (status[b.id] && status[b.id].rank ? 1 : 0) || ((status[b.id]||{}).rank||0) - ((status[a.id]||{}).rank||0));
+  order.forEach(p => {
+    const m = status[p.id], fx = p.v[xp], fy = p.v[yp];
+    if (!(fx > 0 && fy > 0)){ if (m) missing.push(p.short); return; }
+    const x = sx(fx), y = sy(fy), col = FCOL[p.family] || "#666";
+    const out = m ? m.outcome : null, rank = m && m.rank;
+    let g, tipTxt;
+    const vals = `${fmt(fy)} ${ul(ay.unit)}, ${fmt(fx)} ${ul(ax.unit)}`;
+    if (!m){ g = `<circle r="3.5" fill="${TH.faint}" fill-opacity=".45"/>`; tipTxt = "Family not selected"; }
+    else if (out === C.CANDIDATE && rank === 1){ g = `<circle r="15" fill="${TH.signal}" fill-opacity=".16"/><circle r="8.5" fill="${TH.signal}" stroke="${TH.ink}" stroke-width="1.6"/>`; tipTxt = res.tie ? "Tied for first" : "Best match"; }
+    else if (out === C.CANDIDATE){ g = `<circle r="6.5" fill="${col}" stroke="${TH.hole}" stroke-width="1.8"/>`; tipTxt = rank ? "Passes, ranked #" + rank : "Passes every limit"; }
+    else if (out === C.NEEDS_DATA){ g = `<circle r="6" fill="${TH.hole}" stroke="${col}" stroke-width="1.8" stroke-dasharray="3 2.4"/>`; tipTxt = "Needs data: not enough to decide"; }
+    else { g = `<circle r="5" fill="${TH.hole}" stroke="${TH.faint}" stroke-width="1.6"/><line x1="-3" y1="-3" x2="3" y2="3" stroke="${TH.faint}" stroke-width="1.4"/><line x1="-3" y1="3" x2="3" y2="-3" stroke="${TH.faint}" stroke-width="1.4"/>`;
+      const f = m.constraint_results.find(cr => cr.status === C.FAIL); tipTxt = "Ruled out" + (f ? ": " + plabel(f.constraint.property).toLowerCase() + " " + fmt(f.used_value) + " " + ul(f.constraint.units) : ""); }
+    const name = m ? m.label : p.short;
+    o.push(`<g class="pt" tabindex="${m ? 0 : -1}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" data-tip="${esc(name + "|" + tipTxt + "|" + vals)}" aria-label="${esc(name + ". " + tipTxt + ". " + vals)}"><circle class="hit" r="12" fill="transparent"/>${g}</g>`);
+    if (m && out === C.CANDIDATE) plabs.push({x, y, rank, right: x < L + pw - (narrow ? 100 : 130), t: (rank && rank <= 3 ? "#" + rank + " " : "") + p.short});
+  });
+  ["L","R"].forEach(side => { const g = plabs.filter(q => (q.right ? "R" : "L") === side).sort((a,b) => a.y - b.y); let last = -1e9;
+    g.forEach(q => { q.ly = Math.max(q.y + 4, last + 14); last = q.ly; }); });
+  plabs.forEach(q => labs.push(`<text x="${(q.right ? q.x+12 : q.x-12).toFixed(1)}" y="${q.ly.toFixed(1)}" text-anchor="${q.right ? "start" : "end"}" font-size="${q.rank === 1 ? 13 : 11.5}" font-weight="${q.rank === 1 ? 800 : 600}" fill="${TH.ink}" paint-order="stroke" stroke="${TH.plot}" stroke-width="4">${esc(q.t)}</text>`));
+  o.push(labs.join(""));
+  o.push(`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" stroke="${TH.tick}" stroke-width="1"/>`);
+  $("chart").innerHTML = o.join("");
+  // tally, legend, off-axis limits
+  const nC = res.by_outcome(C.CANDIDATE).length, nAll = res.materials.length;
+  $("tally").innerHTML = `<b>${nC}</b> of ${nAll} ${nAll === 1 ? "material meets" : "materials meet"} every limit`;
+  $("legend").innerHTML = `<span><i><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="${TH.signal}" stroke="${TH.ink}" stroke-width="1.3"/></svg></i>Best match</span>
+    <span><i><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="${TH.tick}" stroke="${TH.hole}" stroke-width="1.3"/></svg></i>Passes</span>
+    <span><i><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="${TH.hole}" stroke="${TH.tick}" stroke-width="1.5" stroke-dasharray="2.5 2"/></svg></i>Needs data</span>
+    <span><i><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="${TH.hole}" stroke="${TH.faint}" stroke-width="1.4"/><path d="M4.5 4.5l5 5M4.5 9.5l5-5" stroke="${TH.faint}" stroke-width="1.2"/></svg></i>Ruled out</span>
+    ${guide ? `<span><i><svg width="20" height="10"><line x1="0" y1="9" x2="20" y2="1" stroke="${TH.signal}" stroke-width="1.6" stroke-dasharray="4 3"/></svg></i>Same ${guide} per kilogram as #1 (above it is better)</span>` : ""}
+    <span><i><svg width="18" height="12"><rect width="18" height="12" fill="url(#hatchL)"/><defs><pattern id="hatchL" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${TH.ink}" stroke-opacity=".35" stroke-width="1.4"/></pattern></defs></svg></i>Outside your limits</span>`;
+  const off = req.constraints.filter(c => c.property !== xp && c.property !== yp).map(c => `${plabel(c.property).toLowerCase()} ${c.op === ">=" ? "≥" : "≤"} ${fmt(Number(c.value))} ${ul(c.units)}`);
+  const notes = [];
+  if (off.length) notes.push("Also screened, not on these axes: " + off.join("; ") + ". Points that fail it are crossed out.");
+  if (missing.length) notes.push("Not plotted, no value for this axis: " + missing.join(", ") + ".");
+  $("offaxis").textContent = notes.join(" ");
+  // tooltips
+  const tip = $("tip"), svg = $("chart");
+  const show = el => { const [n, s, v] = el.dataset.tip.split("|"); const r = el.getBoundingClientRect(), b = svg.parentNode.getBoundingClientRect();
+    tip.innerHTML = `<b>${esc(n)}</b><br>${esc(s)}<br>${esc(v)}`; tip.style.left = (r.left + r.width/2 - b.left) + "px"; tip.style.top = (r.top - b.top) + "px"; tip.classList.add("on"); };
+  svg.querySelectorAll(".pt").forEach(el => { el.addEventListener("mouseenter", () => show(el)); el.addEventListener("focus", () => show(el));
+    el.addEventListener("click", () => show(el)); el.addEventListener("mouseleave", () => tip.classList.remove("on")); el.addEventListener("blur", () => tip.classList.remove("on")); });
+}
+
+
+// ---------------- hero callouts follow the current best match
+function bestRec(mid, p){
+  const a = AX[p], rs = DATA.records.filter(x => x.material_id === mid && x.property === p && typeof x.value === "number");
+  if (!a || !rs.length) return null;
+  return rs.map(x => [E.convert(x.value, x.units, a.unit), x]).sort((u,v) => a.worst === "max" ? v[0]-u[0] : u[0]-v[0])[0];
+}
+function heroUpdate(res){
+  const r = res.by_outcome(C.CANDIDATE).filter(m => m.rank).sort((a,b) => a.rank - b.rank)[0];
+  const vis = (id, on) => { $(id).style.visibility = on ? "visible" : "hidden"; };
+  if (!r){ $("co1v").textContent = "None yet"; $("co1s").textContent = "No metal meets every limit you set."; vis("co2", false); vis("co3", false); $("etch").textContent = ""; return; }
+  const p = PT[r.material_id]; $("co1v").textContent = p ? p.short : r.label; $("co1s").textContent = r.label;
+  $("etch").textContent = (p ? p.short : r.designation).toUpperCase();
+  const yp = $("ay").value !== "density" ? $("ay").value : "yield_strength";
+  [["co2", yp], ["co3", "density"]].forEach(([id, prop]) => { const b = bestRec(r.material_id, prop);
+    vis(id, !!b); if (!b) return;
+    $(id + "k").textContent = AX[prop].label; $(id + "v").textContent = fmt(b[0]) + " " + ul(AX[prop].unit);
+    $(id + "s").textContent = b[1].basis + ", " + String(b[1].source_locator).split(";")[0]; });
+}
 // ---------------- init
 const mats = new Set(DATA.records.map(r => r.material_id));
-$("datastat").textContent = `${mats.size} materials · ${DATA.records.length} values, each checked against its source`;
+$("nmat").textContent = mats.size; $("ncap").textContent = `metals, ${DATA.records.length} values traced to their source page`;
+window.addEventListener("beforeprint", () => { TH = LIGHT; if (lastDraw) drawChart(...lastDraw); });
+window.addEventListener("afterprint", () => { TH = DARK; if (lastDraw) drawChart(...lastDraw); });
 $("coverage").textContent = `Data: ${mats.size} aluminum, steel, stainless and titanium grades from MIL-HDBK-5J (US Government, approved for public release), room-temperature properties. Not yet covered: plastics, 300-series stainless, high-temperature data, corrosion ratings.`;
 if (hasFeedback) $("fb").href = FEEDBACK_URL; else $("fb").closest("p").classList.add("hide");
 if (GC_CODE && GC_CODE.indexOf("__") < 0 && /^[a-z0-9-]+$/.test(GC_CODE)) {
   const sc = document.createElement("script"); sc.async = true; sc.src = "https://gc.zgo.at/count.js";
   sc.dataset.goatcounter = "https://" + GC_CODE + ".goatcounter.com/count"; document.body.appendChild(sc);
 }
-chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn);
+chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn); initAxes();
 const hx = (location.hash.match(/^#(?:ex=)?(\w+)$/) || [])[1];
 loadExample(EXAMPLES[hx] ? hx : "bracket", false);
 })();
