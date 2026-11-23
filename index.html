@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MaterialIQ: find the right material, with every number traced to its source</title>
+<meta name="description" content="Free early-access tool for mechanical engineers: screen metals against your part's limits and get a ranked shortlist where every value links to its handbook source.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--ink:#1C1C1E;--muted:#5E5E66;--line:#ECECEF;--bg:#FAFAFA;--accent:#C2410C;--accentSoft:#FFF1EA;--fail:#A12B2B;--warn:#8A5300}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,Poppins,'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+header{background:#fff;border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:19px;letter-spacing:-.03em}
+.beta{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--accent);background:var(--accentSoft);border-radius:999px;padding:4px 10px}
+.verified{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.vdot{width:8px;height:8px;border-radius:999px;background:#2F8A57;display:inline-block}
+.intro{text-align:center;padding:40px 0 22px}
+.intro h1{margin:0;font-size:40px;font-weight:700;letter-spacing:-.035em;line-height:1.12}
+.intro p{margin:12px auto 0;max-width:640px;color:#3D3D45;font-size:16px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.lab{font-size:12px;font-weight:600;color:#3B3B44}
+input[type=text],input[type=number],select{padding:10px 12px;border:1px solid #D9D9DE;border-radius:10px;background:#fff;min-height:44px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.limit{display:grid;grid-template-columns:minmax(0,2.2fr) 70px minmax(0,1.2fr) minmax(0,1fr) 44px;gap:8px;align-items:center}
+.iconbtn{width:44px;height:44px;border:1px solid #D9D9DE;background:#fff;border-radius:10px;cursor:pointer;font-size:18px;color:var(--muted)}
+.ghost{border:1px dashed #C9C9D0;background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;color:var(--accent);font-weight:600;text-align:left;min-height:44px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.tog{border:1px solid #D9D9DE;background:#fff;border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:14px;min-height:44px}
+.tog[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.primary{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 22px;font-weight:700;font-size:16px;cursor:pointer;min-height:48px}
+.secondary{background:#fff;border:1px solid #D9D9DE;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.examples{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.examples button{border:0;background:var(--accentSoft);color:#8F3408;border-radius:999px;padding:7px 12px;font-weight:600;cursor:pointer;min-height:36px}
+.err{color:var(--fail);font-size:13px;font-weight:600}
+#results{padding:34px 0 10px}
+.hero{text-align:center;margin-bottom:22px}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted)}
+.hero h2{margin:6px 0 8px;font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1.15}
+.lede{margin:0 auto;max-width:720px;color:#3D3D45}
+.legend{font-size:12px;color:var(--muted);margin-top:10px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:999px;background:var(--accent);margin-right:7px;vertical-align:middle}
+.podium{display:flex;justify-content:center;align-items:flex-start;gap:18px;flex-wrap:wrap;margin:10px 0 26px}
+.col{flex:1 1 260px;max-width:330px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 22px 22px;margin-top:32px}
+.col.lead{max-width:380px;border:2px solid var(--accent);margin-top:0;box-shadow:0 18px 48px rgba(28,28,30,.12)}
+.badge{display:block;width:max-content;margin:0 auto 12px;font-size:11px;font-weight:700;letter-spacing:.05em;padding:5px 12px;border-radius:999px;background:#F2F2F4}
+.col.lead .badge{background:var(--accent);color:#fff}
+.pic{background:#F7F7F8;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:14px 10px}
+.name{text-align:center;margin-top:12px}
+.name h3{margin:0;font-size:21px;font-weight:700;letter-spacing:-.03em}
+.col.lead .name h3{font-size:26px}
+.name p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.row{border-top:1px solid var(--line);padding:10px 0}
+.row .l{font-size:11px;color:var(--muted)}
+.val{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.num{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.col.lead .num{font-size:22px}
+.num.best{font-weight:800}
+.src{border:0;background:#F2F2F4;color:#55555E;border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer;min-height:24px}
+.src:hover{background:var(--accentSoft);color:#8F3408}
+section.block{margin-top:22px}
+section.block h3{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
+th{text-align:left;font-weight:600;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid #F3F3F5;vertical-align:top}
+tr:last-child td{border-bottom:0}
+.fail{color:var(--fail);font-weight:600}.warn{color:var(--warn);font-weight:600}
+ul{margin:4px 0 0;padding-left:18px}li{margin:3px 0}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:26px 0 8px}
+.none{background:#fff;border:2px solid var(--accent);border-radius:22px;padding:24px;text-align:center;margin-bottom:24px}
+footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px}
+dialog{border:0;border-radius:20px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 30px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(28,28,30,.45)}
+.dlg{padding:24px}
+.dlg h4{margin:0 0 4px;font-size:20px;letter-spacing:-.02em}
+.dlg dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:16px 0}
+.dlg dt{font-size:11px;color:var(--muted)}.dlg dd{margin:0;font-weight:600;font-size:14px}
+.okstamp{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2F8A57;background:#EAF6EF;border-radius:999px;padding:4px 10px}
+.srcbox{background:#F7F7F8;border-radius:12px;padding:12px 14px;font-size:13px}
+.hide{display:none}
+@media (max-width:720px){.intro h1{font-size:30px}.wrap{padding:0 14px}.panel{padding:18px 16px}.limit{grid-template-columns:58px minmax(0,1fr) 96px 44px;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line)}.limit .prop{grid-column:1/-1}.grid2{grid-template-columns:1fr}.hero h2{font-size:28px}.col.lead{order:-1}.col{margin-top:0}.verified{display:none}}
+@media print{header,#inputs,.intro,.actions,footer .nop,dialog{display:none!important}body{background:#fff;font-size:12px}
+.podium{flex-wrap:nowrap;gap:10px}.col,.col.lead{flex:1 1 0;min-width:0;max-width:none;padding:14px}.col{margin-top:22px}.col.lead{margin-top:0;box-shadow:none}
+.src{background:none;padding:0}.card,.col,section.block{break-inside:avoid}#printsrc{display:block!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><svg width="24" height="24" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="14" width="7" height="11" rx="2" fill="#1C1C1E"/><rect x="9.5" y="5" width="7" height="20" rx="2" fill="#C2410C"/><rect x="18" y="10" width="7" height="15" rx="2" fill="#1C1C1E"/></svg>MaterialIQ <span class="beta">FREE EARLY ACCESS</span></div>
+  <div class="verified"><span class="vdot"></span><span id="datastat">Every value verified against its source</span></div>
+</div></header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>Find the right metal in seconds.<br>Trust every number.</h1>
+    <p>Enter your part's must-meet limits. Get a ranked podium where every value links to the exact handbook table and page it came from.</p>
+  </div>
+
+  <form id="inputs" class="panel" novalidate>
+    <div class="examples"><span>Try an example:</span>
+      <button type="button" data-ex="bracket">Lightweight bracket</button>
+      <button type="button" data-ex="stiff">Stiff, light frame</button>
+      <button type="button" data-ex="tough">Tough stainless part</button>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="lab" for="part">Part</label><input id="part" type="text" placeholder="e.g. sensor mounting bracket"></div>
+      <div class="field"><label class="lab" for="temp">Operating temperature (°C)</label><input id="temp" type="number" step="any" value="23"></div>
+    </div>
+    <div class="field">
+      <span class="lab" id="limits-lab">Must-meet limits</span>
+      <div id="limits" role="group" aria-labelledby="limits-lab" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button type="button" class="ghost" id="addlim">+ Add limit</button>
+    </div>
+    <div class="grid2">
+      <div class="field"><span class="lab" id="opt-lab">Optimize for</span>
+        <div class="chips" role="group" aria-labelledby="opt-lab" id="objs"></div></div>
+      <div class="field"><span class="lab" id="fam-lab">Material families</span>
+        <div class="chips" role="group" aria-labelledby="fam-lab" id="fams"></div></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+      <span id="formerr" class="err" role="alert"></span>
+      <button type="submit" class="primary">Find materials →</button>
+    </div>
+  </form>
+
+  <div id="results" aria-live="polite"></div>
+
+  <footer>
+    <p><b>Advisory only.</b> MaterialIQ is a screening aid, not a material approval, design allowable or certification. Not for aerospace, medical-device or pressure-vessel parts. Verify every value and assumption before use in a design.</p>
+    <p id="coverage"></p>
+    <p class="nop">Early access while the app is being built. Feedback shapes what comes next: <a id="fb" href="#" target="_blank" rel="noopener">send feedback</a>.</p>
+  </footer>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlg-h"><div class="dlg" id="dlgbody"></div></dialog>
+
+<script>window.MIQ_DATA={"records":[{"record_id":"M5J-001","material_id":"AL6061-T6-SHT","material_name":"6061-T6 aluminum sheet","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"sheet","condition":"T6 and T62, 0.010-0.249 in","property":"tensile_strength","value":42.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b1), p.3-264; PDF page 566","notes":"Column: T6 sheet 0.010-0.249 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-002","material_id":"AL6061-T6-SHT","material_name":"6061-T6 aluminum sheet","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"sheet","condition":"T6 and T62, 0.010-0.249 in","property":"yield_strength","value":35.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b1), p.3-264; PDF page 566","notes":"Column: T6 sheet 0.010-0.249 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-003","material_id":"AL6061-T6-SHT","material_name":"6061-T6 aluminum sheet","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"sheet","condition":"T6 and T62, 0.010-0.249 in","property":"elastic_modulus","value":9.9,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b1), p.3-264; PDF page 566","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-004","material_id":"AL6061-T6-SHT","material_name":"6061-T6 aluminum sheet","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"sheet","condition":"T6 and T62, 0.010-0.249 in","property":"density","value":0.098,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b1), p.3-264; PDF page 566","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-005","material_id":"AL7075-T6-SHT","material_name":"7075-T6 aluminum sheet","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"sheet","condition":"T6 and T62, 0.040-0.125 in","property":"tensile_strength","value":78.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T6 sheet 0.040-0.125 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-006","material_id":"AL7075-T6-SHT","material_name":"7075-T6 aluminum sheet","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"sheet","condition":"T6 and T62, 0.040-0.125 in","property":"yield_strength","value":68.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T6 sheet 0.040-0.125 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-007","material_id":"AL7075-T6-SHT","material_name":"7075-T6 aluminum sheet","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"sheet","condition":"T6 and T62, 0.040-0.125 in","property":"elongation","value":8.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T6 sheet 0.040-0.125 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-008","material_id":"AL7075-T6-SHT","material_name":"7075-T6 aluminum sheet","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"sheet","condition":"T6 and T62, 0.040-0.125 in","property":"elastic_modulus","value":10.3,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: first value = sheet. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-009","material_id":"AL7075-T6-SHT","material_name":"7075-T6 aluminum sheet","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"sheet","condition":"T6 and T62, 0.040-0.125 in","property":"density","value":0.101,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-010","material_id":"AL2024-T3-SHT","material_name":"2024-T3 aluminum sheet","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"sheet","condition":"T3, 0.010-0.128 in","property":"tensile_strength","value":63.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: T3 sheet 0.010-0.128 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-011","material_id":"AL2024-T3-SHT","material_name":"2024-T3 aluminum sheet","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"sheet","condition":"T3, 0.010-0.128 in","property":"yield_strength","value":42.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: T3 sheet 0.010-0.128 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-012","material_id":"AL2024-T3-SHT","material_name":"2024-T3 aluminum sheet","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"sheet","condition":"T3, 0.010-0.128 in","property":"elastic_modulus","value":10.5,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: first value = T3 sheet. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-013","material_id":"AL2024-T3-SHT","material_name":"2024-T3 aluminum sheet","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"sheet","condition":"T3, 0.010-0.128 in","property":"density","value":0.1,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-014","material_id":"ST4130-NT-SHT","material_name":"AISI 4130 steel sheet","family":"steel","designation":"AISI 4130","standard":"AMS 6350 / AMS-S-18729 et al.","product_form":"sheet","condition":"Normalized and tempered, stress relieved, 0.188 in and under","property":"tensile_strength","value":95.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.3.1.0(c1), p.2-17; PDF page 71","notes":"Column: AISI 4130 sheet/strip/plate/tubing, 0.188 in and under, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-015","material_id":"ST4130-NT-SHT","material_name":"AISI 4130 steel sheet","family":"steel","designation":"AISI 4130","standard":"AMS 6350 / AMS-S-18729 et al.","product_form":"sheet","condition":"Normalized and tempered, stress relieved, 0.188 in and under","property":"yield_strength","value":75.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.3.1.0(c1), p.2-17; PDF page 71","notes":"Column: AISI 4130 sheet/strip/plate/tubing, 0.188 in and under, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-016","material_id":"ST4130-NT-SHT","material_name":"AISI 4130 steel sheet","family":"steel","designation":"AISI 4130","standard":"AMS 6350 / AMS-S-18729 et al.","product_form":"sheet","condition":"Normalized and tempered, stress relieved, 0.188 in and under","property":"elastic_modulus","value":29.0,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.3.1.0(c1), p.2-17; PDF page 71","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-017","material_id":"ST4130-NT-SHT","material_name":"AISI 4130 steel sheet","family":"steel","designation":"AISI 4130","standard":"AMS 6350 / AMS-S-18729 et al.","product_form":"sheet","condition":"Normalized and tempered, stress relieved, 0.188 in and under","property":"density","value":0.283,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.3.1.0(c1), p.2-17; PDF page 71","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-018","material_id":"SS174PH-H900-BAR","material_name":"17-4PH stainless bar H900","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H900, under 8.000 in","property":"tensile_strength","value":190.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H900, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-019","material_id":"SS174PH-H900-BAR","material_name":"17-4PH stainless bar H900","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H900, under 8.000 in","property":"yield_strength","value":170.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H900, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-020","material_id":"SS174PH-H900-BAR","material_name":"17-4PH stainless bar H900","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H900, under 8.000 in","property":"elongation","value":10.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H900, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-021","material_id":"SS174PH-H900-BAR","material_name":"17-4PH stainless bar H900","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H900, under 8.000 in","property":"elastic_modulus","value":28.5,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-022","material_id":"SS174PH-H900-BAR","material_name":"17-4PH stainless bar H900","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H900, under 8.000 in","property":"density","value":0.282,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: value marked (H900). Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-023","material_id":"SS174PH-H1150-BAR","material_name":"17-4PH stainless bar H1150","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H1150, under 8.000 in","property":"tensile_strength","value":125.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H1150, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-024","material_id":"SS174PH-H1150-BAR","material_name":"17-4PH stainless bar H1150","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H1150, under 8.000 in","property":"yield_strength","value":100.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H1150, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-025","material_id":"SS174PH-H1150-BAR","material_name":"17-4PH stainless bar H1150","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H1150, under 8.000 in","property":"elongation","value":16.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: H1150, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-026","material_id":"SS174PH-H1150-BAR","material_name":"17-4PH stainless bar H1150","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H1150, under 8.000 in","property":"elastic_modulus","value":28.5,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-027","material_id":"SS174PH-H1150-BAR","material_name":"17-4PH stainless bar H1150","family":"stainless","designation":"17-4PH","standard":"AMS 5643","product_form":"bar","condition":"H1150, under 8.000 in","property":"density","value":0.284,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.9.0(e), p.2-199; PDF page 253","notes":"Column: value marked (H1150). Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-028","material_id":"TI64-ANN-BAR","material_name":"Ti-6Al-4V annealed bar","family":"titanium","designation":"Ti-6Al-4V","standard":"AMS 4928","product_form":"bar","condition":"Annealed, under 0.500 in","property":"tensile_strength","value":135.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 5.4.1.0(c1), p.5-54; PDF page 946","notes":"Column: annealed bar under 0.500 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-029","material_id":"TI64-ANN-BAR","material_name":"Ti-6Al-4V annealed bar","family":"titanium","designation":"Ti-6Al-4V","standard":"AMS 4928","product_form":"bar","condition":"Annealed, under 0.500 in","property":"yield_strength","value":125.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 5.4.1.0(c1), p.5-54; PDF page 946","notes":"Column: annealed bar under 0.500 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-030","material_id":"TI64-ANN-BAR","material_name":"Ti-6Al-4V annealed bar","family":"titanium","designation":"Ti-6Al-4V","standard":"AMS 4928","product_form":"bar","condition":"Annealed, under 0.500 in","property":"elongation","value":10.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 5.4.1.0(c1), p.5-54; PDF page 946","notes":"Column: annealed bar under 0.500 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-031","material_id":"TI64-ANN-BAR","material_name":"Ti-6Al-4V annealed bar","family":"titanium","designation":"Ti-6Al-4V","standard":"AMS 4928","product_form":"bar","condition":"Annealed, under 0.500 in","property":"elastic_modulus","value":16.9,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 5.4.1.0(c1), p.5-54; PDF page 946","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-032","material_id":"TI64-ANN-BAR","material_name":"Ti-6Al-4V annealed bar","family":"titanium","designation":"Ti-6Al-4V","standard":"AMS 4928","product_form":"bar","condition":"Annealed, under 0.500 in","property":"density","value":0.16,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 5.4.1.0(c1), p.5-54; PDF page 946","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-033","material_id":"AL6061-T651-PLT","material_name":"6061-T651 aluminum plate","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"plate","condition":"T651 and T62, 0.250-2.000 in","property":"tensile_strength","value":42.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b2), p.3-265; PDF page 567","notes":"Column: T651 plate 0.250-2.000 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-034","material_id":"AL6061-T651-PLT","material_name":"6061-T651 aluminum plate","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"plate","condition":"T651 and T62, 0.250-2.000 in","property":"yield_strength","value":35.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b2), p.3-265; PDF page 567","notes":"Column: T651 plate 0.250-2.000 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-035","material_id":"AL6061-T651-PLT","material_name":"6061-T651 aluminum plate","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"plate","condition":"T651 and T62, 0.250-2.000 in","property":"elastic_modulus","value":9.9,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b2), p.3-265; PDF page 567","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-036","material_id":"AL6061-T651-PLT","material_name":"6061-T651 aluminum plate","family":"aluminum","designation":"6061","standard":"AMS 4025 / AMS 4027 / AMS-QQ-A-250/11","product_form":"plate","condition":"T651 and T62, 0.250-2.000 in","property":"density","value":0.098,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(b2), p.3-265; PDF page 567","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-037","material_id":"AL6061-T6511-EXT","material_name":"6061-T6511 aluminum extruded bar","family":"aluminum","designation":"6061","standard":"AMS 4150 / AMS 4173 / AMS-QQ-A-200/8","product_form":"extrusion","condition":"T6, T6510 and T6511, up to 1.000 in","property":"tensile_strength","value":38.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(g); PDF page 574","notes":"Column: T6/T6510/T6511 up to 1.000 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-038","material_id":"AL6061-T6511-EXT","material_name":"6061-T6511 aluminum extruded bar","family":"aluminum","designation":"6061","standard":"AMS 4150 / AMS 4173 / AMS-QQ-A-200/8","product_form":"extrusion","condition":"T6, T6510 and T6511, up to 1.000 in","property":"yield_strength","value":35.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(g); PDF page 574","notes":"Column: T6/T6510/T6511 up to 1.000 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-039","material_id":"AL6061-T6511-EXT","material_name":"6061-T6511 aluminum extruded bar","family":"aluminum","designation":"6061","standard":"AMS 4150 / AMS 4173 / AMS-QQ-A-200/8","product_form":"extrusion","condition":"T6, T6510 and T6511, up to 1.000 in","property":"elongation","value":10.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(g); PDF page 574","notes":"Column: T6/T6510/T6511 up to 1.000 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-040","material_id":"AL6061-T6511-EXT","material_name":"6061-T6511 aluminum extruded bar","family":"aluminum","designation":"6061","standard":"AMS 4150 / AMS 4173 / AMS-QQ-A-200/8","product_form":"extrusion","condition":"T6, T6510 and T6511, up to 1.000 in","property":"elastic_modulus","value":9.9,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(g); PDF page 574","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-041","material_id":"AL6061-T6511-EXT","material_name":"6061-T6511 aluminum extruded bar","family":"aluminum","designation":"6061","standard":"AMS 4150 / AMS 4173 / AMS-QQ-A-200/8","product_form":"extrusion","condition":"T6, T6510 and T6511, up to 1.000 in","property":"density","value":0.098,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.6.2.0(g); PDF page 574","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-042","material_id":"AL7075-T651-PLT","material_name":"7075-T651 aluminum plate","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"plate","condition":"T651, 0.250-0.499 in","property":"tensile_strength","value":78.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T651 plate 0.250-0.499 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-043","material_id":"AL7075-T651-PLT","material_name":"7075-T651 aluminum plate","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"plate","condition":"T651, 0.250-0.499 in","property":"yield_strength","value":67.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T651 plate 0.250-0.499 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-044","material_id":"AL7075-T651-PLT","material_name":"7075-T651 aluminum plate","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"plate","condition":"T651, 0.250-0.499 in","property":"elongation","value":9.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: T651 plate 0.250-0.499 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-045","material_id":"AL7075-T651-PLT","material_name":"7075-T651 aluminum plate","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"plate","condition":"T651, 0.250-0.499 in","property":"elastic_modulus","value":10.3,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: second value = plate. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-046","material_id":"AL7075-T651-PLT","material_name":"7075-T651 aluminum plate","family":"aluminum","designation":"7075","standard":"AMS 4045 / AMS-QQ-A-250/12","product_form":"plate","condition":"T651, 0.250-0.499 in","property":"density","value":0.101,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.7.6.0(b1), p.3-371; PDF page 673","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-047","material_id":"AL2024-T351-PLT","material_name":"2024-T351 aluminum plate","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"plate","condition":"T351, 0.250-0.499 in","property":"tensile_strength","value":64.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: T351 plate 0.250-0.499 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-048","material_id":"AL2024-T351-PLT","material_name":"2024-T351 aluminum plate","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"plate","condition":"T351, 0.250-0.499 in","property":"yield_strength","value":42.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"A-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: T351 plate 0.250-0.499 in, A-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-049","material_id":"AL2024-T351-PLT","material_name":"2024-T351 aluminum plate","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"plate","condition":"T351, 0.250-0.499 in","property":"elastic_modulus","value":10.7,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: second value = T351 plate. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-050","material_id":"AL2024-T351-PLT","material_name":"2024-T351 aluminum plate","family":"aluminum","designation":"2024","standard":"AMS 4037 / AMS-QQ-A-250/4","product_form":"plate","condition":"T351, 0.250-0.499 in","property":"density","value":0.1,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.2.3.0(b1), p.3-71; PDF page 373","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-051","material_id":"AL5052-H32-SHT","material_name":"5052-H32 aluminum sheet and plate","family":"aluminum","designation":"5052","standard":"AMS 4016","product_form":"sheet","condition":"H32, 0.017-2.000 in","property":"tensile_strength","value":31.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.5.1.0(b1), p.3-220; PDF page 522","notes":"Column: H32 0.017-2.000 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-052","material_id":"AL5052-H32-SHT","material_name":"5052-H32 aluminum sheet and plate","family":"aluminum","designation":"5052","standard":"AMS 4016","product_form":"sheet","condition":"H32, 0.017-2.000 in","property":"yield_strength","value":22.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"LT","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.5.1.0(b1), p.3-220; PDF page 522","notes":"Column: H32 0.017-2.000 in, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-053","material_id":"AL5052-H32-SHT","material_name":"5052-H32 aluminum sheet and plate","family":"aluminum","designation":"5052","standard":"AMS 4016","product_form":"sheet","condition":"H32, 0.017-2.000 in","property":"elastic_modulus","value":10.1,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.5.1.0(b1), p.3-220; PDF page 522","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-054","material_id":"AL5052-H32-SHT","material_name":"5052-H32 aluminum sheet and plate","family":"aluminum","designation":"5052","standard":"AMS 4016","product_form":"sheet","condition":"H32, 0.017-2.000 in","property":"density","value":0.097,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 3.5.1.0(b1), p.3-220; PDF page 522","notes":"Column: single value for all columns. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-055","material_id":"SS155PH-H1025-BAR","material_name":"15-5PH stainless bar H1025","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1025, up to 12 in","property":"tensile_strength","value":155.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1025, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-056","material_id":"SS155PH-H1025-BAR","material_name":"15-5PH stainless bar H1025","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1025, up to 12 in","property":"yield_strength","value":145.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1025, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-057","material_id":"SS155PH-H1025-BAR","material_name":"15-5PH stainless bar H1025","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1025, up to 12 in","property":"elongation","value":12.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1025, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-058","material_id":"SS155PH-H1025-BAR","material_name":"15-5PH stainless bar H1025","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1025, up to 12 in","property":"elastic_modulus","value":28.5,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-059","material_id":"SS155PH-H1025-BAR","material_name":"15-5PH stainless bar H1025","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1025, up to 12 in","property":"density","value":0.283,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-060","material_id":"SS155PH-H1150-BAR","material_name":"15-5PH stainless bar H1150","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1150, up to 12 in","property":"tensile_strength","value":135.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1150, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-061","material_id":"SS155PH-H1150-BAR","material_name":"15-5PH stainless bar H1150","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1150, up to 12 in","property":"yield_strength","value":105.0,"value_min":null,"value_max":null,"value_text":"","units":"ksi","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1150, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-062","material_id":"SS155PH-H1150-BAR","material_name":"15-5PH stainless bar H1150","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1150, up to 12 in","property":"elongation","value":16.0,"value_min":null,"value_max":null,"value_text":"","units":"%","basis":"S-basis","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"L","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: H1150, S-basis. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-063","material_id":"SS155PH-H1150-BAR","material_name":"15-5PH stainless bar H1150","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1150, up to 12 in","property":"elastic_modulus","value":28.5,"value_min":null,"value_max":null,"value_text":"","units":"Msi","basis":"typical","test_method":"MIL-HDBK-5J design property (see handbook Ch. 1 and 9)","temperature_C":22.0,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."},{"record_id":"M5J-064","material_id":"SS155PH-H1150-BAR","material_name":"15-5PH stainless bar H1150","family":"stainless","designation":"15-5PH","standard":"AMS 5659","product_form":"bar","condition":"H1150, up to 12 in","property":"density","value":0.283,"value_min":null,"value_max":null,"value_text":"","units":"lb/in3","basis":"typical","test_method":"","temperature_C":null,"direction":"","uncertainty":"","source_id":"MIL5J","source_locator":"Table 2.6.7.0(b); PDF page 223","notes":"Column: single value for all conditions. Room-temperature value per handbook p.1-7 (recorded as 22 C)."}],"sources":{"MIL5J":{"source_id":"MIL5J","title":"MIL-HDBK-5J, Metallic Materials and Elements for Aerospace Vehicle Structures (31 Jan 2003)","publisher":"US Department of Defense / FAA","url":"https://everyspec.com/MIL-HDBK/MIL-HDBK-0001-0099/MIL_HDBK_5J_139/","license":"US Government work; Distribution Statement A: approved for public release, distribution unlimited (PDF p.1)","reuse_basis":"Public domain US Government publication. Cancelled and superseded by MMPDS; values used for screening only, not as design allowables.","access_date":"2026-11-20","review_status":"unreviewed"}},"units":{"MPa":["stress",1.0,0.0],"GPa":["stress",1000.0,0.0],"kPa":["stress",0.001,0.0],"Pa":["stress",1e-06,0.0],"psi":["stress",0.00689475729,0.0],"ksi":["stress",6.89475729,0.0],"Msi":["stress",6894.75729,0.0],"g/cm3":["density",1.0,0.0],"kg/m3":["density",0.001,0.0],"lb/in3":["density",27.6799047,0.0],"C":["temperature",1.0,0.0],"K":["temperature",1.0,-273.15],"F":["temperature",0.5555555555555556,-17.77777777777778],"W/m-K":["conductivity",1.0,0.0],"BTU/hr-ft-F":["conductivity",1.730735,0.0],"ppm/K":["cte",1.0,0.0],"um/m-K":["cte",1.0,0.0],"1/K":["cte",1000000.0,0.0],"ppm/F":["cte",1.8,0.0],"%":["percent",1.0,0.0],"index":["index",1.0,0.0],"HB":["hardness_hb",1.0,0.0],"HRC":["hardness_hrc",1.0,0.0],"HV":["hardness_hv",1.0,0.0],"Shore D":["hardness_shore_d",1.0,0.0]},"aliases":{"\u00b0C":"C","degC":"C","deg C":"C","\u00b0F":"F","degF":"F","g/cc":"g/cm3","g/cm^3":"g/cm3","kg/m^3":"kg/m3","W/mK":"W/m-K","deg":"C","degrees C":"C","celsius":"C","Celsius":"C","mpa":"MPa","gpa":"GPa","g/cc ":"g/cm3","W/(m\u00b7K)":"W/m-K","W/m\u00b7K":"W/m-K","\u00b5m/m-K":"um/m-K","um/m/K":"um/m-K","1e-6/K":"ppm/K","ppm/C":"ppm/K"},"conservative_bases":["A-basis","B-basis","S-basis","maximum","minimum"],"temp_independent":["density","max_service_temp","min_service_temp","relative_cost"]};</script>
+<script>/* MaterialIQ screening engine (browser port of materialiq/engine.py).
+ * Same rules, same outputs: parity is checked against the Python engine on every known-answer case.
+ * Expects MIQ_DATA = {records:[...], sources:{...}, units:{unit:[dim,factor,offset]}, aliases:{...},
+ *                    conservative_bases:[...], temp_independent:[...]}
+ */
+(function (root) {
+  "use strict";
+  const PASS = "PASS", FAIL = "FAIL", UNKNOWN = "UNKNOWN", UNVERIFIED = "UNVERIFIED", CONFLICT = "CONFLICT";
+  const CANDIDATE = "CANDIDATE", NEEDS_DATA = "NEEDS DATA", EXCLUDED = "EXCLUDED";
+
+  function make(DATA) {
+    const CONS = new Set(DATA.conservative_bases);
+    const TIND = new Set(DATA.temp_independent);
+
+    function canon(u) {
+      let x = (u || "").trim();
+      if (Object.prototype.hasOwnProperty.call(DATA.aliases, x)) x = DATA.aliases[x];
+      if (!Object.prototype.hasOwnProperty.call(DATA.units, x)) throw new Error("unknown unit '" + u + "'");
+      return x;
+    }
+    function convert(v, from, to) {
+      const f = DATA.units[canon(from)], t = DATA.units[canon(to)];
+      if (f[0] !== t[0]) throw new Error("cannot convert " + from + " to " + to);
+      const base = v * f[1] + f[2];
+      return (base - t[2]) / t[1];
+    }
+    const isNum = (r) => r.value !== null || r.value_min !== null || r.value_max !== null;
+
+    function normReq(d) {
+      const cons = (d.constraints || []).map((c, i) => {
+        if (![">=", "<=", "in", "not_in"].includes(c.op)) throw new Error("bad op " + c.op);
+        if ((c.op === ">=" || c.op === "<=") && !c.units) throw new Error("numeric constraint needs units");
+        return { id: c.id || "C" + (i + 1), property: c.property, op: c.op, value: c.value, units: c.units || "", rationale: c.rationale || "" };
+      });
+      const objs = (d.objectives || []).map((o) => ({ property: o.property, goal: o.goal, weight: Number(o.weight ?? 1), units: o.units }));
+      return {
+        case_id: d.case_id || "unnamed", component: d.component || "", context: d.context || {},
+        service_temperature_C: d.service_temperature_C ?? null,
+        temperature_tolerance_C: Number(d.temperature_tolerance_C ?? 10),
+        families: (d.material_families || []).map((s) => s.toLowerCase()),
+        product_forms: (d.product_forms || []).map((s) => s.toLowerCase()),
+        constraints: cons, objectives: objs, tie_margin: Number(d.tie_margin ?? 0.05),
+      };
+    }
+
+    function applicable(recs, req) {
+      const T = req.service_temperature_C;
+      if (recs.length && TIND.has(recs[0].property)) return [recs.slice(), [], []];
+      if (T === null) return [[], recs, []];
+      const ok = [], unk = [], wrong = [];
+      for (const r of recs) {
+        if (r.temperature_C === null) unk.push(r);
+        else if (Math.abs(r.temperature_C - T) <= req.temperature_tolerance_C) ok.push(r);
+        else wrong.push(r);
+      }
+      return [ok, unk, wrong];
+    }
+    const conservative = (r, op) => op === ">=" ? (r.value_min !== null ? r.value_min : r.value) : (r.value_max !== null ? r.value_max : r.value);
+    const representative = (r) => r.value !== null ? r.value : (r.value_min !== null && r.value_max !== null ? (r.value_min + r.value_max) / 2 : null);
+
+    function evalConstraint(c, all, req) {
+      const recs = all.filter((r) => r.property === c.property);
+      const R = (status, extra) => Object.assign({ constraint: c, status, used_value: null, used_text: "", record_ids: [], caveats: [] }, extra || {});
+      if (!recs.length) return R(UNKNOWN, { caveats: ["no data for this property"] });
+      if (c.op === "in" || c.op === "not_in") {
+        const allowed = new Set((Array.isArray(c.value) ? c.value : [c.value]).map((v) => String(v).toLowerCase()));
+        const texts = recs.filter((r) => r.value_text);
+        if (!texts.length) return R(UNKNOWN, { record_ids: recs.map((r) => r.record_id), caveats: ["no categorical value recorded"] });
+        const verdicts = new Set(texts.map((r) => allowed.has(r.value_text.toLowerCase()) === (c.op === "in")));
+        const ids = texts.map((r) => r.record_id);
+        const shown = [...new Set(texts.map((r) => r.value_text))].sort().join("; ");
+        if (verdicts.size > 1) return R(CONFLICT, { used_text: shown, record_ids: ids, caveats: ["sources disagree"] });
+        return R([...verdicts][0] ? PASS : FAIL, { used_text: shown, record_ids: ids });
+      }
+      const [ok, unk, wrong] = applicable(recs, req);
+      if (!ok.length) {
+        if (unk.length) return R(UNVERIFIED, { record_ids: unk.map((r) => r.record_id),
+          caveats: [req.service_temperature_C === null ? "service temperature not specified" : "test temperature not stated in source"] });
+        const temps = [...new Set(wrong.map((r) => r.temperature_C))].sort((a, b) => a - b);
+        return R(UNVERIFIED, { record_ids: wrong.map((r) => r.record_id), caveats: ["data only at " + temps.join(", ") + " C, not at service temperature"] });
+      }
+      const vals = [], cav = [];
+      for (const r of ok) {
+        const v = conservative(r, c.op);
+        if (v === null) { cav.push(r.record_id + ": no bound on the conservative side"); continue; }
+        try { vals.push([convert(v, r.units, c.units), r]); } catch (e) { cav.push(r.record_id + ": " + e.message); }
+      }
+      if (!vals.length) return R(UNVERIFIED, { record_ids: ok.map((r) => r.record_id), caveats: cav });
+      const lim = Number(c.value);
+      const passes = vals.map(([v]) => (c.op === ">=" ? v >= lim : v <= lim));
+      const ids = vals.map(([, r]) => r.record_id);
+      const worst = c.op === ">=" ? Math.min(...vals.map(([v]) => v)) : Math.max(...vals.map(([v]) => v));
+      if (vals.some(([, r]) => !CONS.has(r.basis))) cav.push("typical/nominal value used - verify against a specification minimum");
+      if (vals.some(([, r]) => ["unspecified", "unknown"].includes(r.condition.toLowerCase()))) cav.push("condition/temper unspecified in source");
+      if (passes.every(Boolean)) return R(PASS, { used_value: worst, record_ids: ids, caveats: cav });
+      if (!passes.some(Boolean)) return R(FAIL, { used_value: worst, record_ids: ids, caveats: cav });
+      return R(CONFLICT, { used_value: worst, record_ids: ids, caveats: cav.concat(["sources disagree on pass/fail"]) });
+    }
+
+    function objectiveValue(o, all, req) {
+      const recs = all.filter((r) => r.property === o.property && isNum(r));
+      const [ok, unk] = applicable(recs, req);
+      const pool = ok.length ? ok : (req.service_temperature_C === null ? unk : []);
+      const vals = [], ids = [];
+      for (const r of pool) {
+        const v = representative(r);
+        if (v === null) continue;
+        try { vals.push(convert(v, r.units, o.units)); ids.push(r.record_id); } catch (e) { /* skip */ }
+      }
+      if (!vals.length) return null;
+      return [o.goal === "min" ? Math.max(...vals) : Math.min(...vals), ids];
+    }
+
+    const byMaterial = (() => {
+      const m = new Map();
+      for (const r of DATA.records) { if (!m.has(r.material_id)) m.set(r.material_id, []); m.get(r.material_id).push(r); }
+      return m;
+    })();
+
+    function screen(input) {
+      const req = normReq(input);
+      const results = [], outOfScope = [];
+      for (const [mid, recs] of byMaterial) {
+        const r0 = recs[0];
+        const m = { material_id: mid, label: r0.material_name || r0.designation, family: r0.family, designation: r0.designation,
+          product_form: r0.product_form, condition: r0.condition, outcome: CANDIDATE, constraint_results: [], objective_values: {}, score: null, rank: null };
+        if ((req.families.length && !req.families.includes(r0.family.toLowerCase())) ||
+            (req.product_forms.length && !req.product_forms.includes(r0.product_form.toLowerCase()))) { outOfScope.push(m); continue; }
+        m.constraint_results = req.constraints.map((c) => evalConstraint(c, recs, req));
+        const st = new Set(m.constraint_results.map((c) => c.status));
+        if (st.has(FAIL)) m.outcome = EXCLUDED;
+        else if (st.has(UNKNOWN) || st.has(UNVERIFIED) || st.has(CONFLICT)) m.outcome = NEEDS_DATA;
+        for (const o of req.objectives) { const ov = objectiveValue(o, recs, req); if (ov) m.objective_values[o.property] = ov; }
+        results.push(m);
+      }
+      const cands = results.filter((m) => m.outcome === CANDIDATE);
+      const used = [], dropped = {};
+      for (const o of req.objectives) {
+        const missing = cands.filter((m) => !(o.property in m.objective_values)).map((m) => m.label);
+        if (missing.length) dropped[o.property] = "missing for " + missing.join(", "); else used.push(o);
+      }
+      if (cands.length && used.length) {
+        const tw = used.reduce((s, o) => s + o.weight, 0);
+        for (const m of cands) m.score = 0;
+        for (const o of used) {
+          const vs = cands.map((m) => m.objective_values[o.property][0]);
+          const lo = Math.min(...vs), hi = Math.max(...vs);
+          for (const m of cands) {
+            const v = m.objective_values[o.property][0];
+            let n = hi === lo ? 1 : (v - lo) / (hi - lo);
+            if (o.goal === "min") n = hi !== lo ? 1 - n : 1;
+            m.score += o.weight * n / tw;
+          }
+        }
+        cands.sort((a, b) => b.score - a.score);
+        cands.forEach((m, i) => { m.rank = i + 1; });
+      }
+      let verdict;
+      if (!cands.length) verdict = "No material passes every hard constraint with applicable data. No recommendation.";
+      else if (!used.length) verdict = "Candidates pass all hard constraints, but no objective has data for every candidate. Candidates are listed unranked; engineering judgment required.";
+      else if (cands.length === 1) verdict = "Single candidate passes all hard constraints: " + cands[0].label + ".";
+      else if (cands[0].score - cands[1].score < req.tie_margin)
+        verdict = "No single answer: " + cands[0].label + " and " + cands[1].label + " score within " + Math.round(req.tie_margin * 100) + "% on the stated objectives. Decide on factors outside this comparison.";
+      else verdict = "Leading candidate on stated objectives: " + cands[0].label + " (subject to engineer review).";
+      const byOutcome = (o) => {
+        const rows = results.filter((m) => m.outcome === o);
+        if (o === CANDIDATE) rows.sort((a, b) => ((a.rank === null) - (b.rank === null)) || ((a.rank || 0) - (b.rank || 0)));
+        return rows;
+      };
+      return { requirements: req, materials: results, objectives_used: used.map((o) => o.property), objectives_dropped: dropped,
+               verdict, out_of_scope: outOfScope, by_outcome: byOutcome, tie: cands.length > 1 && used.length > 0 && cands[0].score - cands[1].score < req.tie_margin };
+    }
+    return { screen, convert, CONST: { PASS, FAIL, UNKNOWN, UNVERIFIED, CONFLICT, CANDIDATE, NEEDS_DATA, EXCLUDED } };
+  }
+  if (typeof module !== "undefined" && module.exports) module.exports = { make };
+  else root.MIQEngine = { make };
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+(function(){
+"use strict";
+const DATA = window.MIQ_DATA, E = MIQEngine.make(DATA), C = E.CONST;
+const FEEDBACK_URL = "";
+const hasFeedback = !!FEEDBACK_URL && FEEDBACK_URL.indexOf("__") < 0;
+const GC_CODE = "";
+function track(name){ try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path: name, title: name, event: true}); } catch (e) {} }
+const REC = Object.fromEntries(DATA.records.map(r => [r.record_id, r]));
+const PROPS = {
+  yield_strength:{label:"Yield strength", units:["MPa","ksi"]},
+  tensile_strength:{label:"Tensile strength", units:["MPa","ksi"]},
+  elastic_modulus:{label:"Elastic modulus", units:["GPa","Msi"]},
+  density:{label:"Density", units:["g/cm3","kg/m3","lb/in3"]},
+  elongation:{label:"Elongation", units:["%"]},
+};
+const ULAB = {"g/cm3":"g/cm³","kg/m3":"kg/m³","lb/in3":"lb/in³"};
+const OBJ = {
+  lighter:{label:"Lighter", property:"density", goal:"min", units:"g/cm3"},
+  stronger:{label:"Stronger", property:"yield_strength", goal:"max", units:"MPa"},
+  stiffer:{label:"Stiffer", property:"elastic_modulus", goal:"max", units:"GPa"},
+  ductile:{label:"More ductile", property:"elongation", goal:"max", units:"%"},
+};
+const FAM = {aluminum:"Aluminum", steel:"Steel", stainless:"Stainless", titanium:"Titanium"};
+const TONE = {titanium:["#6E7886","#9AA5B2","#E3E8EE","#B7C0CB"], stainless:["#7B8187","#A9AFB4","#F0F2F3","#C7CCD0"],
+  steel:["#5F656B","#8C9298","#DCE0E3","#A9AFB4"], aluminum:["#9FA7AE","#C9CFD4","#F6F8F9","#DDE2E6"]};
+const EXAMPLES = {
+  bracket:{part:"Sensor mounting bracket", temp:23, limits:[["yield_strength",">=",300,"MPa"],["elongation",">=",8,"%"]], objs:["lighter","stronger"], fams:Object.keys(FAM)},
+  stiff:{part:"Camera gimbal frame", temp:23, limits:[["elastic_modulus",">=",70,"GPa"],["yield_strength",">=",250,"MPa"]], objs:["lighter","stiffer"], fams:Object.keys(FAM)},
+  tough:{part:"Valve actuator lever", temp:23, limits:[["yield_strength",">=",120,"ksi"],["elongation",">=",12,"%"]], objs:["stronger"], fams:["stainless"]},
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = v => v == null ? "-" : (Math.abs(v) >= 100 ? v.toFixed(0) : String(Number(v.toPrecision(3))));
+const ul = u => ULAB[u] || u;
+const $ = id => document.getElementById(id);
+
+// ---------------- inputs
+let objsOn = new Set(["lighter","stronger"]), famsOn = new Set(Object.keys(FAM));
+function limitRow(p, op, v, u){
+  const d = document.createElement("div"); d.className = "limit";
+  const n = $("limits").children.length + 1;
+  d.innerHTML = `<select aria-label="Limit ${n} property" class="prop">${Object.entries(PROPS).map(([k,x]) => `<option value="${k}">${x.label}</option>`).join("")}</select>
+    <select aria-label="Limit ${n} direction (at least or at most)" class="op"><option value=">=">≥</option><option value="<=">≤</option></select>
+    <input aria-label="Limit ${n} value" class="v" type="number" step="any" inputmode="decimal">
+    <select aria-label="Limit ${n} unit" class="unit"></select>
+    <button type="button" class="iconbtn" aria-label="Remove limit ${n}">×</button>`;
+  const ps = d.querySelector(".prop"), us = d.querySelector(".unit");
+  const fill = () => { us.innerHTML = PROPS[ps.value].units.map(x => `<option value="${x}">${ul(x)}</option>`).join(""); };
+  ps.value = p || "yield_strength"; fill(); if (u) us.value = u;
+  d.querySelector(".op").value = op || ">="; if (v != null) d.querySelector(".v").value = v;
+  ps.addEventListener("change", fill);
+  d.querySelector(".iconbtn").addEventListener("click", () => d.remove());
+  $("limits").appendChild(d);
+}
+function chips(el, map, set){
+  el.innerHTML = Object.entries(map).map(([k,x]) => `<button type="button" class="tog" data-k="${k}" aria-pressed="${set.has(k)}">${esc(x.label || x)}</button>`).join("");
+  el.querySelectorAll(".tog").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.k; set.has(k) ? set.delete(k) : set.add(k); b.setAttribute("aria-pressed", set.has(k));
+  }));
+}
+function loadExample(k, scroll = true){
+  const x = EXAMPLES[k]; $("part").value = x.part; $("temp").value = x.temp; $("limits").innerHTML = "";
+  x.limits.forEach(l => limitRow(...l)); objsOn = new Set(x.objs); famsOn = new Set(x.fams);
+  chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn); run(scroll);
+}
+document.querySelectorAll("[data-ex]").forEach(b => b.addEventListener("click", () => { track("example-" + b.dataset.ex); loadExample(b.dataset.ex, true); }));
+$("addlim").addEventListener("click", () => limitRow());
+$("inputs").addEventListener("submit", e => { e.preventDefault(); run(true); });
+
+function collect(){
+  const t = $("temp").value.trim();
+  const limits = [...$("limits").children].map((d,i) => ({id:"C"+(i+1), property:d.querySelector(".prop").value, op:d.querySelector(".op").value,
+    value:d.querySelector(".v").value, units:d.querySelector(".unit").value}));
+  const bad = limits.find(l => l.value === "" || isNaN(Number(l.value)));
+  if (t === "" || isNaN(Number(t))) return {err:"Enter the operating temperature in °C."};
+  if (!limits.length) return {err:"Add at least one must-meet limit."};
+  if (bad) return {err:"Every limit needs a number."};
+  if (!famsOn.size) return {err:"Pick at least one material family."};
+  return {req:{case_id:"web", component:$("part").value.trim() || "Your part", service_temperature_C:Number(t),
+    constraints:limits.map(l => ({...l, value:Number(l.value)})),
+    objectives:[...objsOn].map(k => ({property:OBJ[k].property, goal:OBJ[k].goal, weight:1, units:OBJ[k].units})),
+    material_families:[...famsOn]}};
+}
+
+// ---------------- rendering
+function picture(m, w){
+  const [dk,md,lt,fc] = TONE[m.family] || TONE.steel, id = "g"+Math.random().toString(36).slice(2,8);
+  const form = (m.product_form||"").toLowerCase();
+  if (["sheet","plate","strip"].includes(form)){ const th = form === "sheet" ? 6 : 12;
+    return `<svg viewBox="0 0 300 130" width="100%" style="max-width:${w}px;height:auto;display:block" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lt}"/><stop offset=".45" stop-color="${md}"/><stop offset=".7" stop-color="${lt}"/><stop offset="1" stop-color="${md}"/></linearGradient></defs><ellipse cx="150" cy="108" rx="118" ry="8" fill="#000" opacity=".07"/><polygon points="40,78 170,34 262,58 132,102" fill="url(#${id})"/><polygon points="40,78 132,102 132,${102+th} 40,${78+th}" fill="${md}"/><polygon points="132,102 262,58 262,${58+th} 132,${102+th}" fill="${dk}"/><line x1="70" y1="74" x2="186" y2="35" stroke="#fff" stroke-opacity=".55" stroke-width="2"/></svg>`;}
+  return `<svg viewBox="0 0 300 130" width="100%" style="max-width:${w}px;height:auto;display:block" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${md}"/><stop offset=".28" stop-color="${lt}"/><stop offset=".55" stop-color="${md}"/><stop offset="1" stop-color="${dk}"/></linearGradient><linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lt}"/><stop offset="1" stop-color="${fc}"/></linearGradient></defs><ellipse cx="150" cy="106" rx="118" ry="8" fill="#000" opacity=".07"/><rect x="44" y="40" width="200" height="54" fill="url(#${id})"/><ellipse cx="44" cy="67" rx="13" ry="27" fill="${dk}"/><ellipse cx="244" cy="67" rx="13" ry="27" fill="url(#${id}f)"/></svg>`;
+}
+const srcBtns = ids => ids.map(i => `<button type="button" class="src" data-rec="${esc(i)}" aria-label="Show source ${esc(i)}">${esc(i)}</button>`).join("");
+const plabel = p => (PROPS[p] && PROPS[p].label) || p;
+
+function podiumRows(res, top){
+  const req = res.requirements, rows = [], seen = new Set();
+  for (const o of req.objectives){ if (!res.objectives_used.includes(o.property) || seen.has(o.property)) continue; seen.add(o.property);
+    const vals = top.map(m => m.objective_values[o.property]); const nums = vals.map(v => v[0]);
+    const tgt = o.goal === "min" ? Math.min(...nums) : Math.max(...nums);
+    rows.push({label:plabel(o.property), unit:o.units, cells:vals.map(v => [v[0], v[1]]), best:new Set(new Set(nums).size > 1 ? nums.flatMap((n,i) => n === tgt ? [i] : []) : [])}); }
+  for (const c of req.constraints){ if (seen.has(c.property) || !(c.op === ">=" || c.op === "<=")) continue; seen.add(c.property);
+    const crs = top.map(m => m.constraint_results.find(cr => cr.constraint === c)); const nums = crs.map(cr => cr.used_value);
+    const tgt = c.op === ">=" ? Math.max(...nums) : Math.min(...nums);
+    rows.push({label:plabel(c.property), unit:c.units, cells:crs.map(cr => [cr.used_value, cr.record_ids]), best:new Set(new Set(nums).size > 1 ? nums.flatMap((n,i) => n === tgt ? [i] : []) : [])}); }
+  return rows;
+}
+function column(m, slot, lead, rows, label){
+  const cells = rows.map(r => { const [v, ids] = r.cells[slot], b = r.best.has(slot);
+    return `<div class="row"><div class="l">${esc(r.label)}, ${esc(ul(r.unit))}</div><div class="val"><span class="num${b?" best":""}">${b?'<span class="dot"></span>':""}${esc(fmt(v))}</span>${srcBtns(ids)}</div></div>`; }).join("");
+  return `<article class="col${lead?" lead":""}"><span class="badge">${esc(label)}</span><div class="pic">${picture(m, lead?260:220)}</div>
+    <div class="name"><h3>${esc(m.label)}</h3><p>${esc(m.product_form)} · ${esc(m.condition)}</p></div>${cells}</article>`;
+}
+
+function run(scroll = true){
+  $("formerr").textContent = "";
+  const c = collect(); if (c.err){ $("formerr").textContent = c.err; return; }
+  let res; try { res = E.screen(c.req); } catch (e){ $("formerr").textContent = "Couldn't screen: " + e.message; return; }
+  render(res, c.req);
+  track(res.by_outcome(C.CANDIDATE).length ? "run-result" : "run-no-result");
+  if (scroll) $("results").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function render(res, input){
+  const req = res.requirements, cands = res.by_outcome(C.CANDIDATE), ranked = cands.filter(m => m.rank);
+  const nd = res.by_outcome(C.NEEDS_DATA), ex = res.by_outcome(C.EXCLUDED), n = res.materials.length;
+  const goals = req.objectives.filter(o => res.objectives_used.includes(o.property)).map(o => (o.goal === "min" ? "low " : "high ") + plabel(o.property).toLowerCase()).join(" and ");
+  let eyebrow, h, lede = res.verdict;
+  if (!cands.length){ eyebrow = n + " materials screened"; h = "No material meets every limit"; lede = "Nothing passes every limit with data that applies at your temperature. See below for what's close."; }
+  else if (!ranked.length){ eyebrow = cands.length + " of " + n + " qualify"; h = "These qualify (unranked)"; lede = "Pick at least one 'Optimize for' goal to rank them."; }
+  else if (res.tie){ eyebrow = cands.length + " of " + n + " materials qualify"; h = "No single answer";
+    lede = ranked[0].label + " and " + ranked[1].label + " are within 5% on your goals. Choose between them on cost, machinability or availability."; }
+  else if (cands.length === 1){ eyebrow = "1 of " + n + " materials qualifies"; h = ranked[0].label; lede = "The only material that meets every limit you set."; }
+  else { eyebrow = "Best match out of " + n + " materials"; h = ranked[0].label; lede = "Best balance of " + goals + " among the " + cands.length + " materials that meet every limit."; }
+  const out = [`<div class="hero"><div class="eyebrow">${esc(eyebrow)}</div><h2>${esc(h)}</h2><p class="lede">${esc(lede)}</p>`];
+  if (ranked.length) out.push(`<div class="legend"><span class="dot"></span>marks the best value in each row · click any grey code to see the handbook source</div>`);
+  out.push("</div>");
+  if (ranked.length){
+    const top = ranked.slice(0,3), rows = podiumRows(res, top), order = top.length === 3 ? [1,0,2] : top.map((_,i) => i);
+    const labels = {0: res.tie ? "TIED FOR #1" : "#1 BEST MATCH", 1: res.tie ? "TIED FOR #1" : "#2", 2:"#3"};
+    out.push(`<div class="podium">${order.map(i => column(top[i], i, i === 0, rows, labels[i])).join("")}</div>`);
+    const rest = ranked.slice(3);
+    if (rest.length) out.push(`<section class="block"><h3>Also qualify</h3><div class="card"><table><tr><th>Material</th><th>Form · condition</th>${res.objectives_used.map(p => `<th>${esc(plabel(p))}</th>`).join("")}</tr>${rest.map(m => `<tr><td>${esc(m.label)}</td><td>${esc(m.product_form)} · ${esc(m.condition)}</td>${res.objectives_used.map(p => `<td>${esc(fmt(m.objective_values[p][0]))} ${srcBtns(m.objective_values[p][1])}</td>`).join("")}</tr>`).join("")}</table></div></section>`);
+  } else if (cands.length){
+    out.push(`<div class="none">${cands.map(m => esc(m.label)).join(", ")}</div>`);
+  }
+  if (nd.length) out.push(`<section class="block"><h3>Needs data</h3><div class="card"><ul>${nd.map(m => m.constraint_results.filter(cr => cr.status !== C.PASS).map(cr => {
+      const what = {UNKNOWN:"no value in the source data", UNVERIFIED:"data doesn't apply at your temperature", CONFLICT:"sources disagree"}[cr.status] || cr.status;
+      return `<li><b>${esc(m.label)}</b>: ${esc(plabel(cr.constraint.property))}, <span class="warn">${esc(what)}</span>. Not guessed. ${srcBtns(cr.record_ids)}</li>`; }).join("")).join("")}</ul></div></section>`);
+  if (ex.length) out.push(`<section class="block"><h3>Didn't qualify</h3><div class="card"><table><tr><th>Material</th><th>Failed limit</th><th>Its value</th></tr>${ex.map(m => m.constraint_results.filter(cr => cr.status === C.FAIL).map(cr => {
+      const c = cr.constraint; return `<tr><td>${esc(m.label)}</td><td>${esc(plabel(c.property))} ${c.op === ">=" ? "≥" : "≤"} ${esc(fmt(Number(c.value)))} ${esc(ul(c.units))}</td><td><span class="fail">${esc(fmt(cr.used_value))} ${esc(ul(c.units))}</span> ${srcBtns(cr.record_ids)}</td></tr>`; }).join("")).join("")}</table></div></section>`);
+  const cav = new Set(); cands.forEach(m => m.constraint_results.forEach(cr => cr.caveats.forEach(x => cav.add(m.label + ": " + x))));
+  out.push(`<section class="block"><h3>How this was screened</h3><div class="card"><ul>
+    <li>Strength and elongation use the handbook's guaranteed minimums (A- or S-basis) where available; worst case across sources.</li>
+    <li>Values are room-temperature data and only count within ±10 °C of your operating temperature.</li>
+    <li>Nothing is estimated or filled in. Missing data is shown as missing.</li>
+    ${[...cav].map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></section>`);
+  out.push(`<div id="printsrc" class="hide"></div>`);
+  out.push(`<div class="actions"><button type="button" class="primary" id="pdf">Save as PDF</button><button type="button" class="secondary" id="edit">Edit limits</button></div><p id="pdfhint" style="text-align:center;font-size:13px;color:var(--muted);margin:0"></p>
+    <div class="card" id="fbbox" style="text-align:center;margin-top:18px"><b>Was this useful?</b>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:10px"><button type="button" class="secondary" data-fb="yes">Yes</button><button type="button" class="secondary" data-fb="no">Not really</button></div>
+    <p id="fbthanks" style="margin:10px 0 0;font-size:14px;color:var(--muted)"></p></div>`);
+  $("results").innerHTML = out.join("");
+  $("pdf").addEventListener("click", () => { track("pdf"); $("printsrc").innerHTML = printSources();
+    try { window.print(); } catch (e) { /* blocked in some previews */ }
+    $("pdfhint").textContent = "If no print dialog opened, press Ctrl+P (Cmd+P on Mac) and choose Save as PDF."; });
+  $("edit").addEventListener("click", () => $("inputs").scrollIntoView({behavior:"smooth"}));
+  $("results").querySelectorAll("[data-fb]").forEach(b => b.addEventListener("click", () => {
+    track("useful-" + b.dataset.fb);
+    $("results").querySelectorAll("[data-fb]").forEach(x => { x.disabled = true; });
+    const more = hasFeedback ? ` <a href="${esc(FEEDBACK_URL)}" target="_blank" rel="noopener">Tell us what to improve</a> (1 minute).` : "";
+    $("fbthanks").innerHTML = "Thanks, noted." + more;
+  }));
+  $("results").querySelectorAll(".src").forEach(b => b.addEventListener("click", () => showSource(b.dataset.rec)));
+}
+
+function printSources(){
+  const ids = [...new Set([...$("results").querySelectorAll(".src")].map(b => b.dataset.rec))];
+  return `<section class="block"><h3>Sources</h3><div class="card"><table><tr><th>Ref</th><th>Material</th><th>Property</th><th>Value as published</th><th>Basis</th><th>Where</th></tr>${ids.map(i => { const r = REC[i];
+    return `<tr><td>${esc(i)}</td><td>${esc(r.designation)} ${esc(r.condition)}</td><td>${esc(plabel(r.property))}</td><td>${esc(fmt(r.value))} ${esc(ul(r.units))}</td><td>${esc(r.basis)}</td><td>${esc(r.source_locator)}</td></tr>`; }).join("")}</table></div></section>`;
+}
+function showSource(id){
+  track("source-open");
+  const r = REC[id], s = DATA.sources[r.source_id];
+  const conv = r.units === "ksi" ? ` = ${fmt(E.convert(r.value, "ksi", "MPa"))} MPa` : r.units === "Msi" ? ` = ${fmt(E.convert(r.value, "Msi", "GPa"))} GPa` : r.units === "lb/in3" ? ` = ${fmt(E.convert(r.value, "lb/in3", "g/cm3"))} g/cm³` : "";
+  $("dlgbody").innerHTML = `<span class="okstamp">✓ Checked against the source PDF</span>
+    <h4 id="dlg-h" style="margin-top:12px">${esc(r.material_name)}</h4><div style="color:var(--muted);font-size:13px">${esc(plabel(r.property))}${r.direction ? " · " + esc(r.direction) + " direction" : ""}</div>
+    <div style="font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:8px">${esc(fmt(r.value))} ${esc(ul(r.units))}<span style="font-size:15px;color:var(--muted);font-weight:500">${esc(conv)}</span></div>
+    <dl><div><dt>Basis</dt><dd>${esc(r.basis)}</dd></div><div><dt>Condition</dt><dd>${esc(r.condition)}</dd></div>
+    <div><dt>Specification</dt><dd>${esc(r.standard || "-")}</dd></div><div><dt>Temperature</dt><dd>${r.temperature_C == null ? "n/a" : "Room temperature"}</dd></div></dl>
+    <div class="srcbox"><b>${esc(s.title)}</b><br>${esc(r.source_locator)}<br><span style="color:var(--muted);font-size:12px">${esc(s.license)}</span></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:16px"><button type="button" class="secondary" id="dlgclose">Close</button></div>`;
+  $("dlgclose").addEventListener("click", () => $("dlg").close());
+  $("dlg").showModal(); $("dlgclose").focus();
+}
+$("dlg").addEventListener("click", e => { if (e.target === $("dlg")) $("dlg").close(); });
+
+// ---------------- init
+const mats = new Set(DATA.records.map(r => r.material_id));
+$("datastat").textContent = `${mats.size} materials · ${DATA.records.length} values, each checked against its source`;
+$("coverage").textContent = `Data: ${mats.size} aluminum, steel, stainless and titanium grades from MIL-HDBK-5J (US Government, approved for public release), room-temperature properties. Not yet covered: plastics, 300-series stainless, high-temperature data, corrosion ratings.`;
+if (hasFeedback) $("fb").href = FEEDBACK_URL; else $("fb").closest("p").classList.add("hide");
+if (GC_CODE && GC_CODE.indexOf("__") < 0 && /^[a-z0-9-]+$/.test(GC_CODE)) {
+  const sc = document.createElement("script"); sc.async = true; sc.src = "https://gc.zgo.at/count.js";
+  sc.dataset.goatcounter = "https://" + GC_CODE + ".goatcounter.com/count"; document.body.appendChild(sc);
+}
+chips($("objs"), OBJ, objsOn); chips($("fams"), FAM, famsOn);
+const hx = (location.hash.match(/^#(?:ex=)?(\w+)$/) || [])[1];
+loadExample(EXAMPLES[hx] ? hx : "bracket", false);
+})();
+</script>
+</body>
+</html>
